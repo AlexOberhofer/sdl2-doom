@@ -36,6 +36,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <SDL2/SDL.h>
 #endif
 
 
@@ -799,6 +800,11 @@ void D_DoomMain (void)
     FindResponseFile ();
 	
     IdentifyVersion ();
+
+	//INIT SDL WINDOW
+	if(SDL_Init(SDL_INIT_EVERYTHING != 0)){
+		I_Error((char *) SDL_GetError());
+	}
 	
     setbuf (stdout, NULL);
     modifiedgame = false;
