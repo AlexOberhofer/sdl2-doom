@@ -1,0 +1,5 @@
+SDL Timer
+SDL Sound
+Controller
+OpenGL
+More Resolutions

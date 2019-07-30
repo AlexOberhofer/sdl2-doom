@@ -11,7 +11,7 @@ LDFLAGS=
 LIBS= 
 
 # subdirectory for objects
-O=src/
+O=build
 
 # not too sophisticated dependency
 OBJS=				\
