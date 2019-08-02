@@ -1,0 +1,37 @@
+Game mode indeterminate.
+                     Public DOOM - v1.9                           
+V_Init: allocate screens.
+M_LoadDefaults: Load system defaults.
+Z_Init: Init zone memory allocation daemon. 
+W_Init: Init WADfiles.
+ adding ../res/DOOM.WAD
+===========================================================================
+ATTENTION:  This version of DOOM has been modified.  If you would like to
+get a copy of the original game, call 1-800-IDGAMES or see the readme file.
+        You will not receive technical support for modified games.
+                      press enter to continue
+===========================================================================
+===========================================================================
+                                Shareware!
+===========================================================================
+M_Init: Init miscellaneous info.
+R_Init: Init DOOM refresh daemon - [                          ].....
+InitTextures
+InitFlats............
+InitSprites
+InitColormaps
+R_InitData
+R_InitPointToAngle
+R_InitTables
+R_InitPlanes
+R_InitLightTables
+R_InitSkyMap
+R_InitTranslationsTables
+P_Init: Init Playloop state.
+I_Init: Setting up machine state.
+D_CheckNetGame: Checking network game status.
+startskill 2  deathmatch: 0  startmap: 1  startepisode: 1
+player 1 of 1 (1 nodes)
+S_Init: Setting up sound.
+HU_Init: Setting up heads up display.
+ST_Init: Init status bar.
