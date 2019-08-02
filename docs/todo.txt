@@ -4,4 +4,5 @@ SDL Sound
 Controller
 OpenGL
 More Resolutions
-
+Windows Build
+automated builds for windows and linux binaries
