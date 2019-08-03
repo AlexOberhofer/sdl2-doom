@@ -31,13 +31,8 @@
 #include <sys/time.h>
 #include <sys/types.h>
 
-#ifndef LINUX
-#include <sys/filio.h>
-#endif
-
 #include <fcntl.h>
 #include <unistd.h>
-#include <sys/ioctl.h>
 
 // Timer stuff. Experimental.
 #include <time.h>

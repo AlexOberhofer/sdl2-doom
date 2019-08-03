@@ -2,3 +2,6 @@ linux/
 *.o
 *.wad
 *.WAD
+.cproject
+.project
+.settings
