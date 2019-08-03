@@ -147,6 +147,7 @@ int*		channelrightvol_lookup[NUM_CHANNELS];
 //
 // Safe ioctl, convenience.
 //
+/*
 void
 myioctl
 ( int	fd,
@@ -162,7 +163,7 @@ myioctl
 	fprintf(stderr, "errno=%d\n", errno);
 	exit(-1);
     }
-}
+}*/
 
 
 
