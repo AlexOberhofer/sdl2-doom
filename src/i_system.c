@@ -28,6 +28,7 @@
 #include <stdarg.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <SDL2/SDL.h>
 
 #include "doomdef.h"
 #include "m_misc.h"
@@ -87,16 +88,16 @@ byte* I_ZoneBase (int*	size)
 //
 int  I_GetTime (void)
 {
-    struct timeval	tp;
-    struct timezone	tzp;
-    int			newtics;
-    static int		basetime=0;
-  
-    gettimeofday(&tp, &tzp);
-    if (!basetime)
-	basetime = tp.tv_sec;
-    newtics = (tp.tv_sec-basetime)*TICRATE + tp.tv_usec*TICRATE/1000000;
-    return newtics;
+    static uint32_t base = 0;
+    uint32_t ticks;
+
+    ticks = SDL_GetTicks();
+
+    if (base == 0) { base = ticks; };
+
+    ticks -= base;
+
+    return (ticks*35) / 1000;
 }
 
 
@@ -107,7 +108,8 @@ int  I_GetTime (void)
 void I_Init (void)
 {
     I_InitSound();
-    //  I_InitGraphics();
+    //I_InitGraphics();
+    SDL_Init(SDL_INIT_TIMER);
 }
 
 //
@@ -125,15 +127,7 @@ void I_Quit (void)
 
 void I_WaitVBL(int count)
 {
-#ifdef SGI
-    sginap(1);                                           
-#else
-#ifdef SUN
-    sleep(0);
-#else
-    usleep (count * (1000000/70) );                                
-#endif
-#endif
+	//SDL_Delay((count * 1000)/ 70);
 }
 
 void I_BeginRead(void)
