@@ -4,9 +4,9 @@
 #
 # $Log:$
 #
-CC=  gcc  # gcc or g++
+CC=  x86_64-w64-mingw32-gcc  # gcc or g++
 
-CFLAGS= -g -O0 -Wall -DNORMALUNIX -DLINUX # -DUSEASM 
+CFLAGS= -g -O0 -Wall -DWIN # -DUSEASM 
 LDFLAGS=-L/usr/X11R6/lib
 LIBS=-lXext -lX11 -lnsl -lm
 
@@ -85,7 +85,7 @@ clean:
 
 $(O)/linuxxdoom:	$(OBJS) $(O)/i_main.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(O)/i_main.o \
-	-o $(O)/linuxxdoom `sdl2-config --cflags --libs` $(LIBS)
+	-o $(O)/linuxxdoom.exe `sdl2-config --cflags --libs` $(LIBS)
 
 $(O)/%.o:	%.c
 	$(CC) $(CFLAGS) -c $< -o $@

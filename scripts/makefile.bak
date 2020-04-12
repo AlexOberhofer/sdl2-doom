@@ -6,12 +6,12 @@
 #
 CC=  gcc  # gcc or g++
 
-CFLAGS= -g -O0 -Wall -DNORMALUNIX -DLINUX # -DUSEASM 
-LDFLAGS=-L/usr/X11R6/lib
-LIBS=-lXext -lX11 -lnsl -lm
+CFLAGS= -Wall -DNORMALUNIX -DLINUX # -DUSEASM 
+LDFLAGS=
+LIBS= 
 
 # subdirectory for objects
-O=linux
+O=build
 
 # not too sophisticated dependency
 OBJS=				\
@@ -80,12 +80,12 @@ OBJS=				\
 all:	 $(O)/linuxxdoom
 
 clean:
-	rm -f *.o *~ *.flc
-	rm -f linux/*
+	rm -f *.o 
+	rm -f build/*
 
 $(O)/linuxxdoom:	$(OBJS) $(O)/i_main.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(O)/i_main.o \
-	-o $(O)/linuxxdoom `sdl2-config --cflags --libs` $(LIBS)
+	-o src/$(O)/linuxxdoom `sdl2-config --cflags --libs` 
 
 $(O)/%.o:	%.c
 	$(CC) $(CFLAGS) -c $< -o $@

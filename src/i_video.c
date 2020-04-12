@@ -18,7 +18,7 @@
 // $Log:$
 //
 // DESCRIPTION:
-//	DOOM graphics stuff for X11, UNIX.
+//	DOOM graphics stuff for SDL2, UNIX.
 //
 //-----------------------------------------------------------------------------
 
@@ -59,6 +59,113 @@ int Height, Center_Y;
 // Needs an invisible mouse cursor at least.
 boolean		grabMouse;
 
+int 		lastMouse;
+
+int SDL_GetKey(SDL_Keycode key) {
+
+	//Map SDL keys to engine keys
+	//SEE: Doomdef.h for engine values
+
+	switch (key) {
+		case SDLK_a: return KEY_LEFTARROW;
+		case SDLK_d: return KEY_RIGHTARROW;
+		case SDLK_s: return KEY_DOWNARROW;
+		case SDLK_w: return KEY_UPARROW;
+		case SDLK_ESCAPE: return KEY_ESCAPE;
+		case SDLK_RETURN: return KEY_ENTER;
+		case SDLK_TAB: return KEY_TAB;
+		case SDLK_F1: return KEY_F1;
+		case SDLK_F2: return KEY_F2;
+		case SDLK_F3: return KEY_F3;
+		case SDLK_F4: return KEY_F4;
+		case SDLK_F5: return KEY_F5;
+		case SDLK_F6: return KEY_F6;
+		case SDLK_F7: return KEY_F7;
+		case SDLK_F8: return KEY_F8;
+		case SDLK_F9: return KEY_F9;
+		case SDLK_F10: return KEY_F10;
+		case SDLK_F11: return KEY_F11;
+		case SDLK_F12: return KEY_F12;
+
+		case SDLK_BACKSPACE:
+		case SDLK_DELETE: return KEY_BACKSPACE;
+
+		case SDLK_PAUSE: return KEY_PAUSE;
+
+		case SDLK_KP_EQUALS:
+		case SDLK_EQUALS: return KEY_EQUALS;
+
+		case SDLK_KP_MINUS:
+		case SDLK_MINUS: return KEY_MINUS;
+
+		case SDLK_LSHIFT:
+		case SDLK_RSHIFT: return KEY_RSHIFT;
+
+		case SDLK_LCTRL:
+		case SDLK_RCTRL: return KEY_RCTRL;
+
+		case SDLK_LALT:
+		case SDLK_RALT: return KEY_RALT;
+		default: return key;
+	}
+}
+
+void SDL_ManageEvents(){
+	event_t event;
+	uint8_t button;
+
+	while (SDL_PollEvent(&sdl_e)) {
+
+		switch (sdl_e.type) {
+
+			case SDL_KEYDOWN:
+			case SDL_KEYUP:
+				event.type = (sdl_e.type == SDL_KEYDOWN) ? ev_keydown : ev_keyup;
+				event.data1 = SDL_GetKey(sdl_e.key.keysym.sym);
+				D_PostEvent(&event);
+				break;
+			case SDL_MOUSEBUTTONDOWN:
+			case SDL_MOUSEBUTTONUP:
+				event.type = ev_mouse;
+				event.data1 = lastMouse;
+
+				button = sdl_e.button.button;
+
+				if (sdl_e.type == SDL_MOUSEBUTTONDOWN) {
+					event.data1 |= button == SDL_BUTTON_LEFT;
+					event.data1 |= button == SDL_BUTTON_MIDDLE ? 2 : 0;
+					event.data1 |= button == SDL_BUTTON_RIGHT ? 4 : 0;
+				} else {
+					event.data1 ^= button == SDL_BUTTON_LEFT;
+					event.data1 ^= button == SDL_BUTTON_MIDDLE ? 2 : 0;
+					event.data1 ^= button == SDL_BUTTON_RIGHT ? 4 : 0;
+				}
+
+				event.data2 = event.data3 = 0;
+
+				D_PostEvent(&event);
+
+				lastMouse = event.data1;
+				break;
+			case SDL_MOUSEMOTION:
+				if (!grabMouse) {
+					break; //X11 acts this way
+				}
+
+				event.type = ev_mouse;
+
+				event.data1 = 0;
+				event.data2 = sdl_e.motion.xrel << 2;
+				event.data3 = -(sdl_e.motion.yrel << 2);
+
+				D_PostEvent(&event);
+				break;
+			case SDL_QUIT:
+				I_Quit();
+				break;
+		}
+	}
+}
 
 // Blocky mode,
 // replace each 320x200 pixel with multiply*multiply pixels.
@@ -100,7 +207,8 @@ void I_GetEvent(void)
 //
 void I_StartTic (void)
 {
-	//TODO: EVENT HANDLE HERE
+	//EVENT HANDLE HERE
+	SDL_ManageEvents();
 }
 
 

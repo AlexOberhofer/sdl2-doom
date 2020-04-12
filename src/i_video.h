@@ -54,6 +54,10 @@ void I_ReadScreen (byte* scr);
 void I_BeginRead (void);
 void I_EndRead (void);
 
+//SDL Functions
+void SDL_ManageEvents(void);
+//int SDL_GetKey(SDL_Keycode key);
+
 
 
 #endif
