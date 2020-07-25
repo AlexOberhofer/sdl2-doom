@@ -1,25 +1,36 @@
 # SDL 2 DOOM
 
+<p align="center"><b>DISCLAIMER:<br></b> This repository is <b>NOT</b> meant to be used as a replacement for any modern source port. It has issues and is <b>EXPERIMENTAL</b>. Please look into one of the more popular source ports if that is your goal. The main goal of this repository is my exploration into the doom source code. <br>
+ 
+Hopefully I will eventually have time to return to this project.
+</p>
+
 ## Screenshots 
 
+<p> 
+Examples of bootable WADs:
+<p><br>
+  
 <br><br>
-<center> Ultimate DOOM </center>
+
 <p align="center">
+  <b>Ultimate DOOM</b><br>
   <img src="https://github.com/AlexOberhofer/sdl2_doom/raw/master/docs/ultimatedoom.PNG" alt="Ultimate Doom"/> <br>
 </p><br><br><br>
 
-<center> DOOM II </center>
 <p align="center">
+    <b>DOOM II</b><br> 
     <img src="https://github.com/AlexOberhofer/sdl2_doom/raw/master/docs/doom2.PNG" alt="Doom II"/>
 </p><br><br><br>
 
-<center> TNT Evilution </center>
+<center>  </center>
 <p align="center">
+    <b>TNT Evilution</b><br>
     <img src="https://github.com/AlexOberhofer/sdl2_doom/raw/master/docs/tnt.PNG" alt="Doom II"/>
 </p><br><br><br>
 
-<center> The Plutonia Experiment </center>
 <p align="center">
+    <b>The Plutonia Experiment</b><br>
     <img src="https://github.com/AlexOberhofer/sdl2_doom/raw/master/docs/plutonia.PNG" alt="Doom II"/>
 </p><br><br><br>
 
