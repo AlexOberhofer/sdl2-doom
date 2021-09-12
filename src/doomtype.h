@@ -39,9 +39,15 @@ typedef unsigned char byte;
 
 
 // Predefined with some OS.
+#ifdef MACOS
+#include <limits.h>
+#endif
+
 #ifdef LINUX
 #include <values.h>
-#else
+#endif
+
+#ifndef LINUX || MACOS
 #define MAXCHAR		((char)0x7f)
 #define MAXSHORT	((short)0x7fff)
 
