@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,7 +14,6 @@
 //
 // DESCRIPTION:  Head up display
 //
-//-----------------------------------------------------------------------------
 
 #ifndef __HU_STUFF_H__
 #define __HU_STUFF_H__
@@ -36,7 +32,6 @@
 
 #define HU_BROADCAST	5
 
-#define HU_MSGREFRESH	KEY_ENTER
 #define HU_MSGX		0
 #define HU_MSGY		0
 #define HU_MSGWIDTH	64	// in characters
@@ -58,10 +53,7 @@ void HU_Drawer(void);
 char HU_dequeueChatChar(void);
 void HU_Erase(void);
 
+extern char *chat_macros[10];
 
 #endif
-//-----------------------------------------------------------------------------
-//
-// $Log:$
-//
-//-----------------------------------------------------------------------------
+

@@ -18,516 +18,397 @@
 // $Log:$
 //
 // DESCRIPTION:
-//	DOOM graphics stuff for SDL2, UNIX.
+//	DOOM graphics stuff for X11, UNIX.
 //
 //-----------------------------------------------------------------------------
 
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
+static const char
+rcsid[] = "$Id: i_x.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 
-#include <stdarg.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <SDL2/SDL.h>
-
-#include <netinet/in.h>
-#include <errno.h>
-#include <signal.h>
-
-#include "doomstat.h"
-#include "i_system.h"
+#include "config.h"
 #include "v_video.h"
 #include "m_argv.h"
+#include "d_event.h"
 #include "d_main.h"
+#include "i_video.h"
+#include "z_zone.h"
 
-#include "doomdef.h"
+#include "tables.h"
+#include "doomkeys.h"
 
-//SDL Vars
-SDL_Window *window;
-SDL_Renderer *renderer;
-SDL_Surface *surface;
-SDL_Event sdl_e;
+#include "doomgeneric.h"
 
-int Width, Center_X;
-int Height, Center_Y;
+#include <stdbool.h>
+#include <stdlib.h>
 
-// Fake mouse handling.
-// This cannot work properly w/o DGA.
-// Needs an invisible mouse cursor at least.
-boolean		grabMouse;
+#include <fcntl.h>
 
-int 		lastMouse;
+#include <stdarg.h>
 
-int SDL_GetKey(SDL_Keycode key) {
+#include <sys/types.h>
 
-	//Map SDL keys to engine keys
-	//SEE: Doomdef.h for engine values
+//#define CMAP256
 
-	switch (key) {
-		case SDLK_a: return KEY_LEFTARROW;
-		case SDLK_d: return KEY_RIGHTARROW;
-		case SDLK_s: return KEY_DOWNARROW;
-		case SDLK_w: return KEY_UPARROW;
-		case SDLK_ESCAPE: return KEY_ESCAPE;
-		case SDLK_RETURN: return KEY_ENTER;
-		case SDLK_TAB: return KEY_TAB;
-		case SDLK_F1: return KEY_F1;
-		case SDLK_F2: return KEY_F2;
-		case SDLK_F3: return KEY_F3;
-		case SDLK_F4: return KEY_F4;
-		case SDLK_F5: return KEY_F5;
-		case SDLK_F6: return KEY_F6;
-		case SDLK_F7: return KEY_F7;
-		case SDLK_F8: return KEY_F8;
-		case SDLK_F9: return KEY_F9;
-		case SDLK_F10: return KEY_F10;
-		case SDLK_F11: return KEY_F11;
-		case SDLK_F12: return KEY_F12;
-
-		case SDLK_BACKSPACE:
-		case SDLK_DELETE: return KEY_BACKSPACE;
-
-		case SDLK_PAUSE: return KEY_PAUSE;
-
-		case SDLK_KP_EQUALS:
-		case SDLK_EQUALS: return KEY_EQUALS;
-
-		case SDLK_KP_MINUS:
-		case SDLK_MINUS: return KEY_MINUS;
-
-		case SDLK_LSHIFT:
-		case SDLK_RSHIFT: return KEY_RSHIFT;
-
-		case SDLK_LCTRL:
-		case SDLK_RCTRL: return KEY_RCTRL;
-
-		case SDLK_LALT:
-		case SDLK_RALT: return KEY_RALT;
-		default: return key;
-	}
-}
-
-void SDL_ManageEvents(){
-	event_t event;
-	uint8_t button;
-
-	while (SDL_PollEvent(&sdl_e)) {
-
-		switch (sdl_e.type) {
-
-			case SDL_KEYDOWN:
-			case SDL_KEYUP:
-				event.type = (sdl_e.type == SDL_KEYDOWN) ? ev_keydown : ev_keyup;
-				event.data1 = SDL_GetKey(sdl_e.key.keysym.sym);
-				D_PostEvent(&event);
-				break;
-			case SDL_MOUSEBUTTONDOWN:
-			case SDL_MOUSEBUTTONUP:
-				event.type = ev_mouse;
-				event.data1 = lastMouse;
-
-				button = sdl_e.button.button;
-
-				if (sdl_e.type == SDL_MOUSEBUTTONDOWN) {
-					event.data1 |= button == SDL_BUTTON_LEFT;
-					event.data1 |= button == SDL_BUTTON_MIDDLE ? 2 : 0;
-					event.data1 |= button == SDL_BUTTON_RIGHT ? 4 : 0;
-				} else {
-					event.data1 ^= button == SDL_BUTTON_LEFT;
-					event.data1 ^= button == SDL_BUTTON_MIDDLE ? 2 : 0;
-					event.data1 ^= button == SDL_BUTTON_RIGHT ? 4 : 0;
-				}
-
-				event.data2 = event.data3 = 0;
-
-				D_PostEvent(&event);
-
-				lastMouse = event.data1;
-				break;
-			case SDL_MOUSEMOTION:
-				if (!grabMouse) {
-					break; //X11 acts this way
-				}
-
-				event.type = ev_mouse;
-
-				event.data1 = 0;
-				event.data2 = sdl_e.motion.xrel << 2;
-				event.data3 = -(sdl_e.motion.yrel << 2);
-
-				D_PostEvent(&event);
-				break;
-			case SDL_QUIT:
-				I_Quit();
-				break;
-		}
-	}
-}
-
-// Blocky mode,
-// replace each 320x200 pixel with multiply*multiply pixels.
-// According to Dave Taylor, it still is a bonehead thing
-// to use ....
-static int	multiply=1;
-
-void I_ShutdownGraphics(void)
+struct FB_BitField
 {
-  	if(surface){
-		SDL_FreeSurface(surface);
-	}
-	if(renderer){
-		SDL_DestroyRenderer(renderer);
-	}
-	if(window){
-		SDL_DestroyWindow(window);
-	}
+	uint32_t offset;			/* beginning of bitfield	*/
+	uint32_t length;			/* length of bitfield		*/
+};
+
+struct FB_ScreenInfo
+{
+	uint32_t xres;			/* visible resolution		*/
+	uint32_t yres;
+	uint32_t xres_virtual;		/* virtual resolution		*/
+	uint32_t yres_virtual;
+
+	uint32_t bits_per_pixel;		/* guess what			*/
+	
+							/* >1 = FOURCC			*/
+	struct FB_BitField red;		/* bitfield in s_Fb mem if true color, */
+	struct FB_BitField green;	/* else only length is significant */
+	struct FB_BitField blue;
+	struct FB_BitField transp;	/* transparency			*/
+};
+
+static struct FB_ScreenInfo s_Fb;
+int fb_scaling = 1;
+int usemouse = 0;
+
+struct color {
+    uint32_t b:8;
+    uint32_t g:8;
+    uint32_t r:8;
+    uint32_t a:8;
+};
+
+static struct color colors[256];
+
+void I_GetEvent(void);
+
+// The screen buffer; this is modified to draw things to the screen
+
+byte *I_VideoBuffer = NULL;
+
+// If true, game is running as a screensaver
+
+boolean screensaver_mode = false;
+
+// Flag indicating whether the screen is currently visible:
+// when the screen isnt visible, don't render the screen
+
+boolean screenvisible;
+
+// Mouse acceleration
+//
+// This emulates some of the behavior of DOS mouse drivers by increasing
+// the speed when the mouse is moved fast.
+//
+// The mouse input values are input directly to the game, but when
+// the values exceed the value of mouse_threshold, they are multiplied
+// by mouse_acceleration to increase the speed.
+
+float mouse_acceleration = 2.0;
+int mouse_threshold = 10;
+
+// Gamma correction level to use
+
+int usegamma = 0;
+
+typedef struct
+{
+	byte r;
+	byte g;
+	byte b;
+} col_t;
+
+// Palette converted to RGB565
+
+static uint16_t rgb565_palette[256];
+
+void cmap_to_rgb565(uint16_t * out, uint8_t * in, int in_pixels)
+{
+    int i, j;
+    struct color c;
+    uint16_t r, g, b;
+
+    for (i = 0; i < in_pixels; i++)
+    {
+        c = colors[*in]; 
+        r = ((uint16_t)(c.r >> 3)) << 11;
+        g = ((uint16_t)(c.g >> 2)) << 5;
+        b = ((uint16_t)(c.b >> 3)) << 0;
+        *out = (r | g | b);
+
+        in++;
+        for (j = 0; j < fb_scaling; j++) {
+            out++;
+        }
+    }
 }
 
+void cmap_to_fb(uint8_t * out, uint8_t * in, int in_pixels)
+{
+    int i, j, k;
+    struct color c;
+    uint32_t pix;
+    uint16_t r, g, b;
+
+    for (i = 0; i < in_pixels; i++)
+    {
+        c = colors[*in];  /* R:8 G:8 B:8 format! */
+        r = (uint16_t)(c.r >> (8 - s_Fb.red.length));
+        g = (uint16_t)(c.g >> (8 - s_Fb.green.length));
+        b = (uint16_t)(c.b >> (8 - s_Fb.blue.length));
+        pix = r << s_Fb.red.offset;
+        pix |= g << s_Fb.green.offset;
+        pix |= b << s_Fb.blue.offset;
+
+        for (k = 0; k < fb_scaling; k++) {
+            for (j = 0; j < s_Fb.bits_per_pixel/8; j++) {
+                *out = (pix >> (j*8));
+                out++;
+            }
+        }
+        in++;
+    }
+}
+
+void I_InitGraphics (void)
+{
+    int i;
+
+	memset(&s_Fb, 0, sizeof(struct FB_ScreenInfo));
+	s_Fb.xres = DOOMGENERIC_RESX;
+	s_Fb.yres = DOOMGENERIC_RESY;
+	s_Fb.xres_virtual = s_Fb.xres;
+	s_Fb.yres_virtual = s_Fb.yres;
+	s_Fb.bits_per_pixel = 32;
+
+	s_Fb.blue.length = 8;
+	s_Fb.green.length = 8;
+	s_Fb.red.length = 8;
+	s_Fb.transp.length = 8;
+
+	s_Fb.blue.offset = 0;
+	s_Fb.green.offset = 8;
+	s_Fb.red.offset = 16;
+	s_Fb.transp.offset = 24;
+	
+
+    printf("I_InitGraphics: framebuffer: x_res: %d, y_res: %d, x_virtual: %d, y_virtual: %d, bpp: %d\n",
+            s_Fb.xres, s_Fb.yres, s_Fb.xres_virtual, s_Fb.yres_virtual, s_Fb.bits_per_pixel);
+
+    printf("I_InitGraphics: framebuffer: RGBA: %d%d%d%d, red_off: %d, green_off: %d, blue_off: %d, transp_off: %d\n",
+            s_Fb.red.length, s_Fb.green.length, s_Fb.blue.length, s_Fb.transp.length, s_Fb.red.offset, s_Fb.green.offset, s_Fb.blue.offset, s_Fb.transp.offset);
+
+    printf("I_InitGraphics: DOOM screen size: w x h: %d x %d\n", SCREENWIDTH, SCREENHEIGHT);
 
 
-//
-// I_StartFrame
-//
+    i = M_CheckParmWithArgs("-scaling", 1);
+    if (i > 0) {
+        i = atoi(myargv[i + 1]);
+        fb_scaling = i;
+        printf("I_InitGraphics: Scaling factor: %d\n", fb_scaling);
+    } else {
+        fb_scaling = s_Fb.xres / SCREENWIDTH;
+        if (s_Fb.yres / SCREENHEIGHT < fb_scaling)
+            fb_scaling = s_Fb.yres / SCREENHEIGHT;
+        printf("I_InitGraphics: Auto-scaling factor: %d\n", fb_scaling);
+    }
+
+
+    /* Allocate screen to draw to */
+	I_VideoBuffer = (byte*)Z_Malloc (SCREENWIDTH * SCREENHEIGHT, PU_STATIC, NULL);  // For DOOM to draw on
+
+	screenvisible = true;
+
+    extern int I_InitInput(void);
+    I_InitInput();
+}
+
+void I_ShutdownGraphics (void)
+{
+	Z_Free (I_VideoBuffer);
+}
+
 void I_StartFrame (void)
 {
-    // er?
 
 }
 
-void I_GetEvent(void)
-{
-
-}
-
-//
-// I_StartTic
-//
 void I_StartTic (void)
 {
-	//EVENT HANDLE HERE
-	SDL_ManageEvents();
+	I_GetEvent();
 }
 
-
-//
-// I_UpdateNoBlit
-//
 void I_UpdateNoBlit (void)
 {
-    // what is this?
 }
 
 //
 // I_FinishUpdate
 //
+
 void I_FinishUpdate (void)
 {
+    int y;
+    int x_offset, y_offset, x_offset_end;
+    unsigned char *line_in, *line_out;
 
-    static int	lasttic;
-    int		tics;
-    int		i;
-    // UNUSED static unsigned char *bigscreen=0;
+    /* Offsets in case FB is bigger than DOOM */
+    /* 600 = s_Fb heigt, 200 screenheight */
+    /* 600 = s_Fb heigt, 200 screenheight */
+    /* 2048 =s_Fb width, 320 screenwidth */
+    y_offset     = (((s_Fb.yres - (SCREENHEIGHT * fb_scaling)) * s_Fb.bits_per_pixel/8)) / 2;
+    x_offset     = (((s_Fb.xres - (SCREENWIDTH  * fb_scaling)) * s_Fb.bits_per_pixel/8)) / 2; // XXX: siglent FB hack: /4 instead of /2, since it seems to handle the resolution in a funny way
+    //x_offset     = 0;
+    x_offset_end = ((s_Fb.xres - (SCREENWIDTH  * fb_scaling)) * s_Fb.bits_per_pixel/8) - x_offset;
 
-	SDL_Texture *texture;
+    /* DRAW SCREEN */
+    line_in  = (unsigned char *) I_VideoBuffer;
+    line_out = (unsigned char *) DG_ScreenBuffer;
 
-    // draws little dots on the bottom of the screen
-    if (devparm)
+    y = SCREENHEIGHT;
+
+    while (y--)
     {
-
-	i = I_GetTime();
-	tics = i - lasttic;
-	lasttic = i;
-
-	if (tics > 20){ tics = 20; }
-
-	for (i=0 ; i<tics*2 ; i+=2)
-	    screens[0][ (SCREENHEIGHT-1)*SCREENWIDTH + i] = 0xff;
-	for ( ; i<20*2 ; i+=2)
-	    screens[0][ (SCREENHEIGHT-1)*SCREENWIDTH + i] = 0x0;
-    
+        int i;
+        for (i = 0; i < fb_scaling; i++) {
+            line_out += x_offset;
+#ifdef CMAP256
+            for (fb_scaling == 1) {
+                memcpy(line_out, line_in, SCREENWIDTH); /* fb_width is bigger than Doom SCREENWIDTH... */
+            } else {
+                //XXX FIXME fb_scaling support!
+            }
+#else
+            //cmap_to_rgb565((void*)line_out, (void*)line_in, SCREENWIDTH);
+            cmap_to_fb((void*)line_out, (void*)line_in, SCREENWIDTH);
+#endif
+            line_out += (SCREENWIDTH * fb_scaling * (s_Fb.bits_per_pixel/8)) + x_offset_end;
+        }
+        line_in += SCREENWIDTH;
     }
 
-    // scales the screen size before blitting it
-    if (multiply == 2)
-    {
-		I_Error("Err: Switch not implemented: 2\n");
-    }
-    else if (multiply == 3)
-    {
-		I_Error("Err: Switch not implemented: 3\n");
-    }
-    else if (multiply == 4)
-    {
-		I_Error("Err: Switch not implemented: 4\n");
-    }
-
-	texture = SDL_CreateTextureFromSurface(renderer, surface);
-
-	SDL_RenderClear(renderer);
-	SDL_RenderCopy(renderer, texture, NULL, NULL);
-	SDL_RenderPresent(renderer);
+	DG_DrawFrame();
 }
-
 
 //
 // I_ReadScreen
 //
 void I_ReadScreen (byte* scr)
 {
-    memcpy (scr, screens[0], SCREENWIDTH*SCREENHEIGHT);
-}
-
-void UploadNewPalette()
-{
-
+    memcpy (scr, I_VideoBuffer, SCREENWIDTH * SCREENHEIGHT);
 }
 
 //
 // I_SetPalette
 //
+#define GFX_RGB565(r, g, b)			((((r & 0xF8) >> 3) << 11) | (((g & 0xFC) >> 2) << 5) | ((b & 0xF8) >> 3))
+#define GFX_RGB565_R(color)			((0xF800 & color) >> 11)
+#define GFX_RGB565_G(color)			((0x07E0 & color) >> 5)
+#define GFX_RGB565_B(color)			(0x001F & color)
+
 void I_SetPalette (byte* palette)
 {
-    int x;
-	int y;
-	SDL_Palette *s_palette;
+	int i;
+	//col_t* c;
 
-	s_palette = surface->format->palette;
+	//for (i = 0; i < 256; i++)
+	//{
+	//	c = (col_t*)palette;
 
-	for(x = 0; x< s_palette->ncolors; x++){
+	//	rgb565_palette[i] = GFX_RGB565(gammatable[usegamma][c->r],
+	//								   gammatable[usegamma][c->g],
+	//								   gammatable[usegamma][c->b]);
 
-		y = gammatable[usegamma][*palette++];
-		s_palette->colors[x].r = (y << 8) + y;
-
-		y = gammatable[usegamma][*palette++];
-		s_palette->colors[x].g = (y << 8) + y;
-
-		y = gammatable[usegamma][*palette++];
-		s_palette->colors[x].b = (y << 8) + y;
-	}
-}
-
-void I_InitGraphics(void)
-{
-    int			n;
-    int			pnum;
-    int			x=0;
-    int			y=0;
+	//	palette += 3;
+	//}
     
-    // warning: char format, different type arg
-    char		xsign=' ';
-    char		ysign=' ';
-    
-	uint32_t windowFlags = SDL_WINDOW_SHOWN;
 
-    if(window != NULL){
-		return;
-	}
+    /* performance boost:
+     * map to the right pixel format over here! */
 
-    signal(SIGINT, (void (*)(int)) I_Quit);
-
-    if (M_CheckParm("-2")){ multiply = 2; }	
-
-    if (M_CheckParm("-3")) { multiply = 3; }
-
-    if (M_CheckParm("-4")) { multiply = 4; }
-
-    Width = SCREENWIDTH * multiply;
-    Height = SCREENHEIGHT * multiply;
-
-	Center_X = Width / 2;
-	Center_Y= Height / 2;
-
-    // check for command-line display name
-	/* 
-    if ( (pnum=M_CheckParm("-disp")) ) // suggest parentheses around assignment
-	displayname = myargv[pnum+1];
-    else
-	displayname = 0;*/
-
-    // check if the user wants to grab the mouse (quite unnice)
-    grabMouse = !!M_CheckParm("-grabmouse");
-
-    // check for command-line geometry
-	/* 
-    if ( (pnum=M_CheckParm("-geom")) ) // suggest parentheses around assignment
-    {
-	// warning: char format, different type arg 3,5
-	n = sscanf(myargv[pnum+1], "%c%d%c%d", &xsign, &x, &ysign, &y);
-	
-	if (n==2)
-	    x = y = 0;
-	else if (n==6)
-	{
-	    if (xsign == '-')
-		x = -x;
-	    if (ysign == '-')
-		y = -y;
-	}
-	else
-	    I_Error("bad -geom parameter");
-    } */ //Add this to the list: things I dont understand
-
-	if(grabMouse)
-	{
-		SDL_SetRelativeMouseMode(true);
-	} else 
-	{
-		SDL_ShowCursor(false);
-	}
-
-	window = SDL_CreateWindow("DOOM", x, y, Width, Height, windowFlags);
-	if(window == NULL){
-		I_Error(SDL_GetError());
-	}
-
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
-	if(renderer == NULL){
-		I_Error(SDL_GetError());
-	}
-
-	surface = SDL_CreateRGBSurface(0, Width, Height, 8, 0, 0, 0, 0);
-
-    if (multiply == 1)
-	screens[0] = (unsigned char *) (surface->pixels);
-    else
-	screens[0] = (unsigned char *) malloc (SCREENWIDTH * SCREENHEIGHT);
-
-}
-
-
-unsigned	exptable[256];
-
-void InitExpand (void)
-{
-    int		i;
-	
-    for (i=0 ; i<256 ; i++)
-	exptable[i] = i | (i<<8) | (i<<16) | (i<<24);
-}
-
-double		exptable2[256*256];
-
-void InitExpand2 (void)
-{
-    int		i;
-    int		j;
-    // UNUSED unsigned	iexp, jexp;
-    double*	exp;
-    union
-    {
-	double 		d;
-	unsigned	u[2];
-    } pixel;
-	
-    printf ("building exptable2...\n");
-    exp = exptable2;
-    for (i=0 ; i<256 ; i++)
-    {
-	pixel.u[0] = i | (i<<8) | (i<<16) | (i<<24);
-	for (j=0 ; j<256 ; j++)
-	{
-	    pixel.u[1] = j | (j<<8) | (j<<16) | (j<<24);
-	    *exp++ = pixel.d;
-	}
+    for (i=0; i<256; ++i ) {
+        colors[i].a = 0;
+        colors[i].r = gammatable[usegamma][*palette++];
+        colors[i].g = gammatable[usegamma][*palette++];
+        colors[i].b = gammatable[usegamma][*palette++];
     }
-    printf ("done.\n");
 }
 
-int	inited;
+// Given an RGB value, find the closest matching palette index.
 
-void
-Expand4
-( unsigned*	lineptr,
-  double*	xline )
+int I_GetPaletteIndex (int r, int g, int b)
 {
-    double	dpixel;
-    unsigned	x;
-    unsigned 	y;
-    unsigned	fourpixels;
-    unsigned	step;
-    double*	exp;
-	
-    exp = exptable2;
-    if (!inited)
+    int best, best_diff, diff;
+    int i;
+    col_t color;
+
+    printf("I_GetPaletteIndex\n");
+
+    best = 0;
+    best_diff = INT_MAX;
+
+    for (i = 0; i < 256; ++i)
     {
-	inited = 1;
-	InitExpand2 ();
+    	color.r = GFX_RGB565_R(rgb565_palette[i]);
+    	color.g = GFX_RGB565_G(rgb565_palette[i]);
+    	color.b = GFX_RGB565_B(rgb565_palette[i]);
+
+        diff = (r - color.r) * (r - color.r)
+             + (g - color.g) * (g - color.g)
+             + (b - color.b) * (b - color.b);
+
+        if (diff < best_diff)
+        {
+            best = i;
+            best_diff = diff;
+        }
+
+        if (diff == 0)
+        {
+            break;
+        }
     }
-		
-		
-    step = 3*SCREENWIDTH/2;
-	
-    y = SCREENHEIGHT-1;
-    do
-    {
-	x = SCREENWIDTH;
 
-	do
-	{
-	    fourpixels = lineptr[0];
-			
-	    dpixel = *(double *)( (int)exp + ( (fourpixels&0xffff0000)>>13) );
-	    xline[0] = dpixel;
-	    xline[160] = dpixel;
-	    xline[320] = dpixel;
-	    xline[480] = dpixel;
-			
-	    dpixel = *(double *)( (int)exp + ( (fourpixels&0xffff)<<3 ) );
-	    xline[1] = dpixel;
-	    xline[161] = dpixel;
-	    xline[321] = dpixel;
-	    xline[481] = dpixel;
-
-	    fourpixels = lineptr[1];
-			
-	    dpixel = *(double *)( (int)exp + ( (fourpixels&0xffff0000)>>13) );
-	    xline[2] = dpixel;
-	    xline[162] = dpixel;
-	    xline[322] = dpixel;
-	    xline[482] = dpixel;
-			
-	    dpixel = *(double *)( (int)exp + ( (fourpixels&0xffff)<<3 ) );
-	    xline[3] = dpixel;
-	    xline[163] = dpixel;
-	    xline[323] = dpixel;
-	    xline[483] = dpixel;
-
-	    fourpixels = lineptr[2];
-			
-	    dpixel = *(double *)( (int)exp + ( (fourpixels&0xffff0000)>>13) );
-	    xline[4] = dpixel;
-	    xline[164] = dpixel;
-	    xline[324] = dpixel;
-	    xline[484] = dpixel;
-			
-	    dpixel = *(double *)( (int)exp + ( (fourpixels&0xffff)<<3 ) );
-	    xline[5] = dpixel;
-	    xline[165] = dpixel;
-	    xline[325] = dpixel;
-	    xline[485] = dpixel;
-
-	    fourpixels = lineptr[3];
-			
-	    dpixel = *(double *)( (int)exp + ( (fourpixels&0xffff0000)>>13) );
-	    xline[6] = dpixel;
-	    xline[166] = dpixel;
-	    xline[326] = dpixel;
-	    xline[486] = dpixel;
-			
-	    dpixel = *(double *)( (int)exp + ( (fourpixels&0xffff)<<3 ) );
-	    xline[7] = dpixel;
-	    xline[167] = dpixel;
-	    xline[327] = dpixel;
-	    xline[487] = dpixel;
-
-	    lineptr+=4;
-	    xline+=8;
-	} while (x-=16);
-	xline += step;
-    } while (y--);
+    return best;
 }
 
+void I_BeginRead (void)
+{
+}
 
+void I_EndRead (void)
+{
+}
+
+void I_SetWindowTitle (char *title)
+{
+	DG_SetWindowTitle(title);
+}
+
+void I_GraphicsCheckCommandLine (void)
+{
+}
+
+void I_SetGrabMouseCallback (grabmouse_callback_t func)
+{
+}
+
+void I_EnableLoadingDisk(void)
+{
+}
+
+void I_BindVideoVariables (void)
+{
+}
+
+void I_DisplayFPSDots (boolean dots_on)
+{
+}
+
+void I_CheckIsScreensaver (void)
+{
+}

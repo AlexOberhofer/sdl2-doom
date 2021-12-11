@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -15,23 +12,25 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// $Log:$
-//
 // DESCRIPTION:
 //	Rendering main loop and setup functions,
 //	 utility functions (BSP, geometry, trigonometry).
 //	See tables.c, too.
 //
-//-----------------------------------------------------------------------------
+
+
+
+
 
 #include <stdlib.h>
 #include <math.h>
 
 
 #include "doomdef.h"
-#include "d_net.h"
+#include "d_loop.h"
 
 #include "m_bbox.h"
+#include "m_menu.h"
 
 #include "r_local.h"
 #include "r_sky.h"
@@ -97,17 +96,6 @@ int			viewangletox[FINEANGLES/2];
 // to the lowest viewangle that maps back to x ranges
 // from clipangle to -clipangle.
 angle_t			xtoviewangle[SCREENWIDTH+1];
-
-
-// UNUSED.
-// The finetangentgent[angle+FINEANGLES/4] table
-// holds the fixed_t tangent values for view angles,
-// ranging from MININT to 0 to MAXINT.
-// fixed_t		finetangent[FINEANGLES/2];
-
-// fixed_t		finesine[5*FINEANGLES/4];
-fixed_t*		finecosine = &finesine[FINEANGLES/4];
-
 
 lighttable_t*		scalelight[LIGHTLEVELS][MAXLIGHTSCALE];
 lighttable_t*		scalelightfixed[MAXLIGHTSCALE];
@@ -394,6 +382,7 @@ R_PointToDist
     fixed_t	dy;
     fixed_t	temp;
     fixed_t	dist;
+    fixed_t     frac;
 	
     dx = abs(x - viewx);
     dy = abs(y - viewy);
@@ -404,8 +393,19 @@ R_PointToDist
 	dx = dy;
 	dy = temp;
     }
+
+    // Fix crashes in udm1.wad
+
+    if (dx != 0)
+    {
+        frac = FixedDiv(dy, dx);
+    }
+    else
+    {
+	frac = 0;
+    }
 	
-    angle = (tantoangle[ FixedDiv(dy,dx)>>DBITS ]+ANG90) >> ANGLETOFINESHIFT;
+    angle = (tantoangle[frac>>DBITS]+ANG90) >> ANGLETOFINESHIFT;
 
     // use as cosine
     dist = FixedDiv (dx, finesine[angle] );	
@@ -449,8 +449,8 @@ void R_InitPointToAngle (void)
 fixed_t R_ScaleFromGlobalAngle (angle_t visangle)
 {
     fixed_t		scale;
-    int			anglea;
-    int			angleb;
+    angle_t		anglea;
+    angle_t		angleb;
     int			sinea;
     int			sineb;
     fixed_t		num;
@@ -705,8 +705,8 @@ void R_ExecuteSetViewSize (void)
     else
     {
 	colfunc = basecolfunc = R_DrawColumnLow;
-	fuzzcolfunc = R_DrawFuzzColumn;
-	transcolfunc = R_DrawTranslatedColumn;
+	fuzzcolfunc = R_DrawFuzzColumnLow;
+	transcolfunc = R_DrawTranslatedColumnLow;
 	spanfunc = R_DrawSpanLow;
     }
 
@@ -761,30 +761,27 @@ void R_ExecuteSetViewSize (void)
 //
 // R_Init
 //
-extern int	detailLevel;
-extern int	screenblocks;
 
 
 
 void R_Init (void)
 {
     R_InitData ();
-    printf ("\nR_InitData");
+    printf (".");
     R_InitPointToAngle ();
-    printf ("\nR_InitPointToAngle");
+    printf (".");
     R_InitTables ();
     // viewwidth / viewheight / detailLevel are set by the defaults
-    printf ("\nR_InitTables");
+    printf (".");
 
     R_SetViewSize (screenblocks, detailLevel);
     R_InitPlanes ();
-    printf ("\nR_InitPlanes");
+    printf (".");
     R_InitLightTables ();
-    printf ("\nR_InitLightTables");
+    printf (".");
     R_InitSkyMap ();
-    printf ("\nR_InitSkyMap");
     R_InitTranslationTables ();
-    printf ("\nR_InitTranslationsTables");
+    printf (".");
 	
     framecount = 0;
 }

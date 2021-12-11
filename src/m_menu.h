@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +15,6 @@
 // DESCRIPTION:
 //   Menu widget stuff, episode selection and such.
 //    
-//-----------------------------------------------------------------------------
 
 
 #ifndef __M_MENU__
@@ -57,12 +53,9 @@ void M_StartControlPanel (void);
 
 
 
+extern int detailLevel;
+extern int screenblocks;
 
 
 
 #endif    
-//-----------------------------------------------------------------------------
-//
-// $Log:$
-//
-//-----------------------------------------------------------------------------

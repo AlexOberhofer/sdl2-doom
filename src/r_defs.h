@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +15,6 @@
 // DESCRIPTION:
 //      Refresh/rendering module, shared data struct definitions.
 //
-//-----------------------------------------------------------------------------
 
 
 #ifndef __R_DEFS__
@@ -38,11 +34,10 @@
 // SECTORS do store MObjs anyway.
 #include "p_mobj.h"
 
+#include "i_video.h"
 
+#include "v_patch.h"
 
-#ifdef __GNUG__
-#pragma interface
-#endif
 
 
 
@@ -282,18 +277,6 @@ typedef struct
 
 
 
-// posts are runs of non masked source pixels
-typedef struct
-{
-    byte		topdelta;	// -1 is the last post in a column
-    byte		length; 	// length data bytes follows
-} post_t;
-
-// column_t is a list of 0 or more post_t, (byte)-1 terminated
-typedef post_t	column_t;
-
-
-
 // PC direct to screen pointers
 //B UNUSED - keep till detailshift in r_draw.c resolved
 //extern byte*	destview;
@@ -346,27 +329,6 @@ typedef struct drawseg_s
     short*		maskedtexturecol;
     
 } drawseg_t;
-
-
-
-// Patches.
-// A patch holds one or more columns.
-// Patches are used for sprites and all masked pictures,
-// and we compose textures from the TEXTURE1/2 lists
-// of patches.
-typedef struct 
-{ 
-    short		width;		// bounding box size 
-    short		height; 
-    short		leftoffset;	// pixels to the left of origin 
-    short		topoffset;	// pixels below the origin 
-    int			columnofs[8];	// only [width] used
-    // the [0] is &columnofs[width] 
-} patch_t;
-
-
-
-
 
 
 
@@ -484,8 +446,3 @@ typedef struct
 
 
 #endif
-//-----------------------------------------------------------------------------
-//
-// $Log:$
-//
-//-----------------------------------------------------------------------------

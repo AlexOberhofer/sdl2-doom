@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,19 +14,12 @@
 //
 // DESCRIPTION:  none
 //
-//-----------------------------------------------------------------------------
 
 #ifndef __HULIB__
 #define __HULIB__
 
 // We are referring to patches.
 #include "r_defs.h"
-
-
-// background and foreground screen numbers
-// different from other modules.
-#define BG			1
-#define FG			0
 
 // font stuff
 #define HU_CHARERASE	KEY_BACKSPACE
@@ -190,8 +180,3 @@ void HUlib_drawIText(hu_itext_t* it);
 void HUlib_eraseIText(hu_itext_t* it); 
 
 #endif
-//-----------------------------------------------------------------------------
-//
-// $Log:$
-//
-//-----------------------------------------------------------------------------

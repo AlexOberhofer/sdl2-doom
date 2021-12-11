@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +15,6 @@
 // DESCRIPTION:
 //  Intermission.
 //
-//-----------------------------------------------------------------------------
 
 #ifndef __WI_STUFF__
 #define __WI_STUFF__
@@ -33,8 +29,7 @@ typedef enum
 {
     NoState = -1,
     StatCount,
-    ShowNextLoc
-
+    ShowNextLoc,
 } stateenum_t;
 
 // Called by main loop, animate the intermission.
@@ -47,9 +42,7 @@ void WI_Drawer (void);
 // Setup for an intermission screen.
 void WI_Start(wbstartstruct_t*	 wbstartstruct);
 
+// Shut down the intermission screen
+void WI_End(void);
+
 #endif
-//-----------------------------------------------------------------------------
-//
-// $Log:$
-//
-//-----------------------------------------------------------------------------

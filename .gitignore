@@ -1,7 +1,9 @@
-linux/
 *.o
 *.wad
 *.WAD
+*/.savegame/
 .cproject
 .project
 .settings
+src/build
+sdl2-doom

@@ -1,8 +1,6 @@
 # SDL 2 DOOM
 
-<p align="center"><b>DISCLAIMER:<br></b> This repository is <b>NOT</b> meant to be used as a replacement for any modern source port. It has issues and is <b>EXPERIMENTAL</b>. Please look into one of the more popular source ports if that is your goal. The main goal of this repository is my exploration into the doom source code. <br>
- 
-Hopefully I will eventually have time to return to this project.
+<p align="center"><b>DISCLAIMER:<br></b> This repository is <b>NOT</b> meant to be used as a replacement for any modern source port. Please look into one of the more popular source ports if that is your goal. The main goal of this repository is my exploration into the doom source code. <br>
 </p>
 
 ## Screenshots 
@@ -36,14 +34,20 @@ Examples of bootable WADs:
 
 ## Overview
 
-This is a source port of the linuxdoom 1.10 engine, developed mostly as an educational tool for myself. Anyone 
-interested in hacking on this project is more than welcome to submit a pull request. This project is currently
-in very early development. See the todo file in /docs/ to see the list of additions I would like to make to
-this engine.
+This is a source port of the ID Software source release of DOOM. This repository is used as an educational tool for myself. Anyone 
+interested in hacking on this project is more than welcome to submit a pull request.
+
+This project is based on the doomgeneric source port.
+
+[doomgeneric](https://github.com/ozkl/doomgeneric)
  
 ## Future
 
-I hope to work on this project again soon. Hopefully a windows port will follow. Please feel free to hack on this codebase and submit any issues or pull requests.
+Goals: 
+
+* Convert to cmake
+* Builds for more platforms
+* Update SDL2 functionality
 
 ## License 
 

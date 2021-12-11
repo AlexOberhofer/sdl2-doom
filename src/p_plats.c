@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -15,12 +12,11 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// $Log:$
-//
 // DESCRIPTION:
 //	Plats (i.e. elevator platforms) code, raising/lowering.
 //
-//-----------------------------------------------------------------------------
+
+#include <stdio.h>
 
 #include "i_system.h"
 #include "z_zone.h"
@@ -62,8 +58,7 @@ void T_PlatRaise(plat_t* plat)
 	    || plat->type == raiseToNearestAndChange)
 	{
 	    if (!(leveltime&7))
-		S_StartSound((mobj_t *)&plat->sector->soundorg,
-			     sfx_stnmov);
+		S_StartSound(&plat->sector->soundorg, sfx_stnmov);
 	}
 	
 				
@@ -71,8 +66,7 @@ void T_PlatRaise(plat_t* plat)
 	{
 	    plat->count = plat->wait;
 	    plat->status = down;
-	    S_StartSound((mobj_t *)&plat->sector->soundorg,
-			 sfx_pstart);
+	    S_StartSound(&plat->sector->soundorg, sfx_pstart);
 	}
 	else
 	{
@@ -80,8 +74,7 @@ void T_PlatRaise(plat_t* plat)
 	    {
 		plat->count = plat->wait;
 		plat->status = waiting;
-		S_StartSound((mobj_t *)&plat->sector->soundorg,
-			     sfx_pstop);
+		S_StartSound(&plat->sector->soundorg, sfx_pstop);
 
 		switch(plat->type)
 		{
@@ -109,7 +102,7 @@ void T_PlatRaise(plat_t* plat)
 	{
 	    plat->count = plat->wait;
 	    plat->status = waiting;
-	    S_StartSound((mobj_t *)&plat->sector->soundorg,sfx_pstop);
+	    S_StartSound(&plat->sector->soundorg,sfx_pstop);
 	}
 	break;
 	
@@ -120,7 +113,7 @@ void T_PlatRaise(plat_t* plat)
 		plat->status = up;
 	    else
 		plat->status = down;
-	    S_StartSound((mobj_t *)&plat->sector->soundorg,sfx_pstart);
+	    S_StartSound(&plat->sector->soundorg,sfx_pstart);
 	}
       case	in_stasis:
 	break;
@@ -188,7 +181,7 @@ EV_DoPlat
 	    // NO MORE DAMAGE, IF APPLICABLE
 	    sec->special = 0;		
 
-	    S_StartSound((mobj_t *)&sec->soundorg,sfx_stnmov);
+	    S_StartSound(&sec->soundorg,sfx_stnmov);
 	    break;
 	    
 	  case raiseAndChange:
@@ -198,7 +191,7 @@ EV_DoPlat
 	    plat->wait = 0;
 	    plat->status = up;
 
-	    S_StartSound((mobj_t *)&sec->soundorg,sfx_stnmov);
+	    S_StartSound(&sec->soundorg,sfx_stnmov);
 	    break;
 	    
 	  case downWaitUpStay:
@@ -209,9 +202,9 @@ EV_DoPlat
 		plat->low = sec->floorheight;
 
 	    plat->high = sec->floorheight;
-	    plat->wait = 35*PLATWAIT;
+	    plat->wait = TICRATE*PLATWAIT;
 	    plat->status = down;
-	    S_StartSound((mobj_t *)&sec->soundorg,sfx_pstart);
+	    S_StartSound(&sec->soundorg,sfx_pstart);
 	    break;
 	    
 	  case blazeDWUS:
@@ -222,9 +215,9 @@ EV_DoPlat
 		plat->low = sec->floorheight;
 
 	    plat->high = sec->floorheight;
-	    plat->wait = 35*PLATWAIT;
+	    plat->wait = TICRATE*PLATWAIT;
 	    plat->status = down;
-	    S_StartSound((mobj_t *)&sec->soundorg,sfx_pstart);
+	    S_StartSound(&sec->soundorg,sfx_pstart);
 	    break;
 	    
 	  case perpetualRaise:
@@ -239,10 +232,10 @@ EV_DoPlat
 	    if (plat->high < sec->floorheight)
 		plat->high = sec->floorheight;
 
-	    plat->wait = 35*PLATWAIT;
+	    plat->wait = TICRATE*PLATWAIT;
 	    plat->status = P_Random()&1;
 
-	    S_StartSound((mobj_t *)&sec->soundorg,sfx_pstart);
+	    S_StartSound(&sec->soundorg,sfx_pstart);
 	    break;
 	}
 	P_AddActivePlat(plat);

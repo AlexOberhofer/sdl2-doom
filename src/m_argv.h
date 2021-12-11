@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,11 +15,12 @@
 // DESCRIPTION:
 //  Nil.
 //    
-//-----------------------------------------------------------------------------
 
 
 #ifndef __M_ARGV__
 #define __M_ARGV__
+
+#include "doomtype.h"
 
 //
 // MISC
@@ -34,10 +32,18 @@ extern  char**	myargv;
 // in the arg list (0 if not found).
 int M_CheckParm (char* check);
 
+// Same as M_CheckParm, but checks that num_args arguments are available
+// following the specified argument.
+int M_CheckParmWithArgs(char *check, int num_args);
+
+void M_FindResponseFile(void);
+
+// Parameter has been specified?
+
+boolean M_ParmExists(char *check);
+
+// Get name of executable used to run this program:
+
+char *M_GetExecutableName(void);
 
 #endif
-//-----------------------------------------------------------------------------
-//
-// $Log:$
-//
-//-----------------------------------------------------------------------------

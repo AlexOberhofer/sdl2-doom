@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,16 +15,12 @@
 // DESCRIPTION:
 //	Sky rendering.
 //
-//-----------------------------------------------------------------------------
 
 
 #ifndef __R_SKY__
 #define __R_SKY__
 
 
-#ifdef __GNUG__
-#pragma interface
-#endif
 
 // SKY, store the number for name.
 #define			SKYFLATNAME  "F_SKY1"
@@ -42,8 +35,3 @@ extern int		skytexturemid;
 void R_InitSkyMap (void);
 
 #endif
-//-----------------------------------------------------------------------------
-//
-// $Log:$
-//
-//-----------------------------------------------------------------------------
