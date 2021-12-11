@@ -16,22 +16,22 @@ OBJS += $(addprefix $(OBJDIR)/, $(SRC_DOOM))
 all:     $(OUTPUT)
 
 clean:
-        rm -rf $(OBJDIR)
-        rm -f $(OUTPUT)
-        rm -f $(OUTPUT).gdb
-        rm -f $(OUTPUT).map
+	rm -rf $(OBJDIR)
+	rm -f $(OUTPUT)
+	rm -f $(OUTPUT).gdb
+	rm -f $(OUTPUT).map
 
 $(OUTPUT):      $(OBJS)
-        $(VB)$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) \
+	$(VB)$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) \
         -o $(OUTPUT) $(LIBS)
 
 $(OBJS): | $(OBJDIR)
 
 $(OBJDIR):
-        mkdir -p $(OBJDIR)
+	mkdir -p $(OBJDIR)
 
 $(OBJDIR)/%.o:  %.c
 
-        $(VB)$(CC) $(CFLAGS) -c $< -o $@
+	$(VB)$(CC) $(CFLAGS) -c $< -o $@
 
 
