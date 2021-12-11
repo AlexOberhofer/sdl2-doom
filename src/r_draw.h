@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,16 +15,12 @@
 // DESCRIPTION:
 //	System specific interface stuff.
 //
-//-----------------------------------------------------------------------------
 
 
 #ifndef __R_DRAW__
 #define __R_DRAW__
 
 
-#ifdef __GNUG__
-#pragma interface
-#endif
 
 
 extern lighttable_t*	dc_colormap;
@@ -109,8 +102,3 @@ void R_DrawViewBorder (void);
 
 
 #endif
-//-----------------------------------------------------------------------------
-//
-// $Log:$
-//
-//-----------------------------------------------------------------------------

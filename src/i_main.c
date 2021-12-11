@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -15,27 +12,47 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// $Log:$
-//
 // DESCRIPTION:
 //	Main program, simply calls D_DoomMain high level loop.
 //
-//-----------------------------------------------------------------------------
 
-#include "doomdef.h"
+//#include "config.h"
 
+#include <stdio.h>
+
+//#include "doomtype.h"
+//#include "i_system.h"
 #include "m_argv.h"
-#include "d_main.h"
 
-int
-main
-( int		argc,
-  char**	argv ) 
-{ 
-    myargc = argc; 
-    myargv = argv; 
- 
-    D_DoomMain (); 
+//
+// D_DoomMain()
+// Not a globally visible function, just included for source reference,
+// calls all startup code, parses command line options.
+//
+
+void D_DoomMain (void);
+
+void M_FindResponseFile(void);
+
+void dg_Create();
+
+
+int main(int argc, char **argv)
+{
+    // save arguments
+
+    myargc = argc;
+    myargv = argv;
+
+    M_FindResponseFile();
+
+    // start doom
+    printf("Starting D_DoomMain\r\n");
+    
+	dg_Create();
+
+	D_DoomMain ();
 
     return 0;
-} 
+}
+

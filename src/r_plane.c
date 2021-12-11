@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -15,15 +12,14 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// $Log:$
-//
 // DESCRIPTION:
 //	Here is a core component: drawing the floors and ceilings,
 //	 while maintaining a per column clipping list only.
 //	Moreover, the sky areas have to be determined.
 //
-//-----------------------------------------------------------------------------
 
+
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "i_system.h"
@@ -127,9 +123,9 @@ R_MapPlane
 	
 #ifdef RANGECHECK
     if (x2 < x1
-	|| x1<0
-	|| x2>=viewwidth
-	|| (unsigned)y>viewheight)
+     || x1 < 0
+     || x2 >= viewwidth
+     || y > viewheight)
     {
 	I_Error ("R_MapPlane: %i, %i at %i",x1,x2,y);
     }
@@ -368,6 +364,7 @@ void R_DrawPlanes (void)
     int			x;
     int			stop;
     int			angle;
+    int                 lumpnum;
 				
 #ifdef RANGECHECK
     if (ds_p - drawsegs > MAXDRAWSEGS)
@@ -417,9 +414,8 @@ void R_DrawPlanes (void)
 	}
 	
 	// regular flat
-	ds_source = W_CacheLumpNum(firstflat +
-				   flattranslation[pl->picnum],
-				   PU_STATIC);
+        lumpnum = firstflat + flattranslation[pl->picnum];
+	ds_source = W_CacheLumpNum(lumpnum, PU_STATIC);
 	
 	planeheight = abs(pl->height-viewz);
 	light = (pl->lightlevel >> LIGHTSEGSHIFT)+extralight;
@@ -445,6 +441,6 @@ void R_DrawPlanes (void)
 			pl->bottom[x]);
 	}
 	
-	Z_ChangeTag (ds_source, PU_CACHE);
+        W_ReleaseLumpNum(lumpnum);
     }
 }

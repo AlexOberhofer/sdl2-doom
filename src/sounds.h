@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -19,73 +16,11 @@
 //	Created by the sound utility written by Dave Taylor.
 //	Kept as a sample, DOOM2  sounds. Frozen.
 //
-//-----------------------------------------------------------------------------
 
 #ifndef __SOUNDS__
 #define __SOUNDS__
 
-
-//
-// SoundFX struct.
-//
-typedef struct sfxinfo_struct	sfxinfo_t;
-
-struct sfxinfo_struct
-{
-    // up to 6-character name
-    char*	name;
-
-    // Sfx singularity (only one at a time)
-    int		singularity;
-
-    // Sfx priority
-    int		priority;
-
-    // referenced sound if a link
-    sfxinfo_t*	link;
-
-    // pitch if a link
-    int		pitch;
-
-    // volume if a link
-    int		volume;
-
-    // sound data
-    void*	data;
-
-    // this is checked every second to see if sound
-    // can be thrown out (if 0, then decrement, if -1,
-    // then throw out, if > 0, then it is in use)
-    int		usefulness;
-
-    // lump number of sfx
-    int		lumpnum;		
-};
-
-
-
-
-//
-// MusicInfo struct.
-//
-typedef struct
-{
-    // up to 6-character name
-    char*	name;
-
-    // lump number of music
-    int		lumpnum;
-    
-    // music data
-    void*	data;
-
-    // music handle once registered
-    int handle;
-    
-} musicinfo_t;
-
-
-
+#include "i_sound.h"
 
 // the complete set of sound effects
 extern sfxinfo_t	S_sfx[];
@@ -290,9 +225,3 @@ typedef enum
 } sfxenum_t;
 
 #endif
-//-----------------------------------------------------------------------------
-//
-// $Log:$
-//
-//-----------------------------------------------------------------------------
-

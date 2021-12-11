@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,12 +13,9 @@
 // GNU General Public License for more details.
 //
 //
-// $Log:$
-//
 // DESCRIPTION:
 //	DOOM strings, by language.
 //
-//-----------------------------------------------------------------------------
 
 
 #ifndef __DSTRINGS__
@@ -29,39 +23,19 @@
 
 
 // All important printed strings.
-// Language selection (message strings).
-// Use -DFRENCH etc.
 
-#ifdef FRENCH
-#include "d_french.h"
-#else
 #include "d_englsh.h"
-#endif
 
 // Misc. other strings.
 #define SAVEGAMENAME	"doomsav"
 
 
-//
-// File locations,
-//  relative to current position.
-// Path names are OS-sensitive.
-//
-#define DEVMAPS "devmaps"
-#define DEVDATA "devdata"
-
-
-// Not done in french?
-
 // QuitDOOM messages
-#define NUM_QUITMESSAGES   22
+// 8 per each game type
+#define NUM_QUITMESSAGES   8
 
-extern char* endmsg[];
+extern char *doom1_endmsg[];
+extern char *doom2_endmsg[];
 
 
 #endif
-//-----------------------------------------------------------------------------
-//
-// $Log:$
-//
-//-----------------------------------------------------------------------------

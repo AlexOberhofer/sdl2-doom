@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,16 +15,12 @@
 // DESCRIPTION:
 //	Rendering of moving objects, sprites.
 //
-//-----------------------------------------------------------------------------
 
 
 #ifndef __R_THINGS__
 #define __R_THINGS__
 
 
-#ifdef __GNUG__
-#pragma interface
-#endif
 
 #define MAXVISSPRITES  	128
 
@@ -70,8 +63,3 @@ R_ClipVisSprite
 
 
 #endif
-//-----------------------------------------------------------------------------
-//
-// $Log:$
-//
-//-----------------------------------------------------------------------------

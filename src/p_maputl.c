@@ -1,9 +1,7 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
+// Copyright(C) 2005, 2006 Andrey Budko
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -15,15 +13,14 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// $Log:$
-//
 // DESCRIPTION:
 //	Movement/collision utility functions,
 //	as used by function in p_map.c. 
 //	BLOCKMAP Iterator functions,
 //	and some PIT_* functions to use for iteration.
 //
-//-----------------------------------------------------------------------------
+
+
 
 #include <stdlib.h>
 
@@ -31,6 +28,7 @@
 #include "m_bbox.h"
 
 #include "doomdef.h"
+#include "doomstat.h"
 #include "p_local.h"
 
 
@@ -108,8 +106,8 @@ P_BoxOnLineSide
 ( fixed_t*	tmbox,
   line_t*	ld )
 {
-    int		p1;
-    int		p2;
+    int		p1 = 0;
+    int		p2 = 0;
 	
     switch (ld->slopetype)
     {
@@ -545,6 +543,8 @@ divline_t 	trace;
 boolean 	earlyout;
 int		ptflags;
 
+static void InterceptsOverrun(int num_intercepts, intercept_t *intercept);
+
 //
 // PIT_AddLineIntercepts.
 // Looks for lines in the given block
@@ -600,6 +600,7 @@ PIT_AddLineIntercepts (line_t* ld)
     intercept_p->frac = frac;
     intercept_p->isaline = true;
     intercept_p->d.line = ld;
+    InterceptsOverrun(intercept_p - intercepts, intercept_p);
     intercept_p++;
 
     return true;	// continue
@@ -665,6 +666,7 @@ boolean PIT_AddThingIntercepts (mobj_t* thing)
     intercept_p->frac = frac;
     intercept_p->isaline = false;
     intercept_p->d.thing = thing;
+    InterceptsOverrun(intercept_p - intercepts, intercept_p);
     intercept_p++;
 
     return true;		// keep going
@@ -692,7 +694,7 @@ P_TraverseIntercepts
 	
     while (count--)
     {
-	dist = MAXINT;
+	dist = INT_MAX;
 	for (scan = intercepts ; scan<intercept_p ; scan++)
 	{
 	    if (scan->frac < dist)
@@ -720,13 +722,132 @@ P_TraverseIntercepts
         if ( !func (in) )
 	    return false;	// don't bother going farther
 
-	in->frac = MAXINT;
+	in->frac = INT_MAX;
     }
 	
     return true;		// everything was traversed
 }
 
+extern fixed_t bulletslope;
 
+// Intercepts Overrun emulation, from PrBoom-plus.
+// Thanks to Andrey Budko (entryway) for researching this and his 
+// implementation of Intercepts Overrun emulation in PrBoom-plus
+// which this is based on.
+
+typedef struct
+{
+    int len;
+    void *addr;
+    boolean int16_array;
+} intercepts_overrun_t;
+
+// Intercepts memory table.  This is where various variables are located
+// in memory in Vanilla Doom.  When the intercepts table overflows, we
+// need to write to them.
+//
+// Almost all of the values to overwrite are 32-bit integers, except for
+// playerstarts, which is effectively an array of 16-bit integers and
+// must be treated differently.
+
+static intercepts_overrun_t intercepts_overrun[] =
+{
+    {4,   NULL,                          false},
+    {4,   NULL, /* &earlyout, */         false},
+    {4,   NULL, /* &intercept_p, */      false},
+    {4,   &lowfloor,                     false},
+    {4,   &openbottom,                   false},
+    {4,   &opentop,                      false},
+    {4,   &openrange,                    false},
+    {4,   NULL,                          false},
+    {120, NULL, /* &activeplats, */      false},
+    {8,   NULL,                          false},
+    {4,   &bulletslope,                  false},
+    {4,   NULL, /* &swingx, */           false},
+    {4,   NULL, /* &swingy, */           false},
+    {4,   NULL,                          false},
+    {40,  &playerstarts,                 true},
+    {4,   NULL, /* &blocklinks, */       false},
+    {4,   &bmapwidth,                    false},
+    {4,   NULL, /* &blockmap, */         false},
+    {4,   &bmaporgx,                     false},
+    {4,   &bmaporgy,                     false},
+    {4,   NULL, /* &blockmaplump, */     false},
+    {4,   &bmapheight,                   false},
+    {0,   NULL,                          false},
+};
+
+// Overwrite a specific memory location with a value.
+
+static void InterceptsMemoryOverrun(int location, int value)
+{
+    int i, offset;
+    int index;
+    void *addr;
+
+    i = 0;
+    offset = 0;
+
+    // Search down the array until we find the right entry
+
+    while (intercepts_overrun[i].len != 0)
+    {
+        if (offset + intercepts_overrun[i].len > location)
+        {
+            addr = intercepts_overrun[i].addr;
+
+            // Write the value to the memory location.
+            // 16-bit and 32-bit values are written differently.
+
+            if (addr != NULL)
+            {
+                if (intercepts_overrun[i].int16_array)
+                {
+                    index = (location - offset) / 2;
+                    ((short *) addr)[index] = value & 0xffff;
+                    ((short *) addr)[index + 1] = (value >> 16) & 0xffff;
+                }
+                else
+                {
+                    index = (location - offset) / 4;
+                    ((int *) addr)[index] = value;
+                }
+            }
+
+            break;
+        }
+
+        offset += intercepts_overrun[i].len;
+        ++i;
+    }
+}
+
+// Emulate overruns of the intercepts[] array.
+
+static void InterceptsOverrun(int num_intercepts, intercept_t *intercept)
+{
+    int location;
+
+    if (num_intercepts <= MAXINTERCEPTS_ORIGINAL)
+    {
+        // No overrun
+
+        return;
+    }
+
+    location = (num_intercepts - MAXINTERCEPTS_ORIGINAL - 1) * 12;
+
+    // Overwrite memory that is overwritten in Vanilla Doom, using
+    // the values from the intercept structure.
+    //
+    // Note: the ->d.{thing,line} member should really have its
+    // address translated into the correct address value for 
+    // Vanilla Doom.
+
+    InterceptsMemoryOverrun(location, intercept->frac);
+    InterceptsMemoryOverrun(location + 4, intercept->isaline);
+    InterceptsMemoryOverrun(location + 8, (int) intercept->d.thing);
+}
 
 
 //

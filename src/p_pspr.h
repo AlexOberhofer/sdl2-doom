@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +15,6 @@
 // DESCRIPTION:
 //  Sprite animation.
 //
-//-----------------------------------------------------------------------------
 
 
 #ifndef __P_PSPR__
@@ -39,9 +35,6 @@
 // and the Frame Sequence table.
 #include "info.h"
 
-#ifdef __GNUG__
-#pragma interface
-#endif
 
 
 //
@@ -76,8 +69,3 @@ typedef struct
 } pspdef_t;
 
 #endif
-//-----------------------------------------------------------------------------
-//
-// $Log:$
-//
-//-----------------------------------------------------------------------------

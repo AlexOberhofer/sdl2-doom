@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +15,6 @@
 // DESCRIPTION:
 // 	The status bar widget code.
 //
-//-----------------------------------------------------------------------------
 
 #ifndef __STLIB__
 #define __STLIB__
@@ -26,15 +22,6 @@
 
 // We are referring to patches.
 #include "r_defs.h"
-
-
-//
-// Background and foreground screen numbers
-//
-#define BG 4
-#define FG 0
-
-
 
 //
 // Typedefs of widgets
@@ -123,7 +110,7 @@ typedef struct
     int			y;
 
     // last icon value
-    int			oldval;
+    boolean		oldval;
 
     // pointer to current icon status
     boolean*		val;
@@ -220,8 +207,3 @@ STlib_updateBinIcon
   boolean		refresh );
 
 #endif
-//-----------------------------------------------------------------------------
-//
-// $Log:$
-//
-//-----------------------------------------------------------------------------

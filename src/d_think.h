@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -20,16 +17,12 @@
 //  thinker, take-your-pick... anything that moves, acts, or
 //  suffers state changes of more or less violent nature.
 //
-//-----------------------------------------------------------------------------
 
 
 #ifndef __D_THINK__
 #define __D_THINK__
 
 
-#ifdef __GNUG__
-#pragma interface
-#endif
 
 
 
@@ -45,8 +38,8 @@ typedef  void (*actionf_p2)( void*, void* );
 
 typedef union
 {
-  actionf_p1	acp1;
   actionf_v	acv;
+  actionf_p1	acp1;
   actionf_p2	acp2;
 
 } actionf_t;
@@ -73,8 +66,3 @@ typedef struct thinker_s
 
 
 #endif
-//-----------------------------------------------------------------------------
-//
-// $Log:$
-//
-//-----------------------------------------------------------------------------

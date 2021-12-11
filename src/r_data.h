@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -19,7 +16,6 @@
 //  Refresh module, data I/O, caching, retrieval of graphics
 //  by name.
 //
-//-----------------------------------------------------------------------------
 
 
 #ifndef __R_DATA__
@@ -28,9 +24,6 @@
 #include "r_defs.h"
 #include "r_state.h"
 
-#ifdef __GNUG__
-#pragma interface
-#endif
 
 // Retrieve column data for span blitting.
 byte*
@@ -56,8 +49,3 @@ int R_TextureNumForName (char *name);
 int R_CheckTextureNumForName (char *name);
 
 #endif
-//-----------------------------------------------------------------------------
-//
-// $Log:$
-//
-//-----------------------------------------------------------------------------

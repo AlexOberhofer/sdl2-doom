@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -15,11 +12,10 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// $Log:$
-//
 // DESCRIPTION:  Ceiling aninmation (lowering, crushing, raising)
 //
-//-----------------------------------------------------------------------------
+
+
 
 #include "z_zone.h"
 #include "doomdef.h"
@@ -69,8 +65,7 @@ void T_MoveCeiling (ceiling_t* ceiling)
 	      case silentCrushAndRaise:
 		break;
 	      default:
-		S_StartSound((mobj_t *)&ceiling->sector->soundorg,
-			     sfx_stnmov);
+		S_StartSound(&ceiling->sector->soundorg, sfx_stnmov);
 		// ?
 		break;
 	    }
@@ -85,8 +80,7 @@ void T_MoveCeiling (ceiling_t* ceiling)
 		break;
 		
 	      case silentCrushAndRaise:
-		S_StartSound((mobj_t *)&ceiling->sector->soundorg,
-			     sfx_pstop);
+		S_StartSound(&ceiling->sector->soundorg, sfx_pstop);
 	      case fastCrushAndRaise:
 	      case crushAndRaise:
 		ceiling->direction = -1;
@@ -112,8 +106,7 @@ void T_MoveCeiling (ceiling_t* ceiling)
 	    {
 	      case silentCrushAndRaise: break;
 	      default:
-		S_StartSound((mobj_t *)&ceiling->sector->soundorg,
-			     sfx_stnmov);
+		S_StartSound(&ceiling->sector->soundorg, sfx_stnmov);
 	    }
 	}
 	
@@ -122,8 +115,7 @@ void T_MoveCeiling (ceiling_t* ceiling)
 	    switch(ceiling->type)
 	    {
 	      case silentCrushAndRaise:
-		S_StartSound((mobj_t *)&ceiling->sector->soundorg,
-			     sfx_pstop);
+		S_StartSound(&ceiling->sector->soundorg, sfx_pstop);
 	      case crushAndRaise:
 		ceiling->speed = CEILSPEED;
 	      case fastCrushAndRaise:

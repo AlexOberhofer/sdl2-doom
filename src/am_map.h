@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,10 +15,12 @@
 // DESCRIPTION:
 //  AutoMap module.
 //
-//-----------------------------------------------------------------------------
 
 #ifndef __AMMAP_H__
 #define __AMMAP_H__
+
+#include "d_event.h"
+#include "m_cheat.h"
 
 // Used by ST StatusBar stuff.
 #define AM_MSGHEADER (('a'<<24)+('m'<<16))
@@ -44,10 +43,7 @@ void AM_Drawer (void);
 void AM_Stop (void);
 
 
+extern cheatseq_t cheat_amap;
+
 
 #endif
-//-----------------------------------------------------------------------------
-//
-// $Log:$
-//
-//-----------------------------------------------------------------------------

@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +15,6 @@
 // DESCRIPTION:
 //	Items: key cards, artifacts, weapon, ammunition.
 //
-//-----------------------------------------------------------------------------
 
 
 #ifndef __D_ITEMS__
@@ -26,9 +22,6 @@
 
 #include "doomdef.h"
 
-#ifdef __GNUG__
-#pragma interface
-#endif
 
 
 // Weapon info: sprite frames, ammunition use.
@@ -46,8 +39,3 @@ typedef struct
 extern  weaponinfo_t    weaponinfo[NUMWEAPONS];
 
 #endif
-//-----------------------------------------------------------------------------
-//
-// $Log:$
-//
-//-----------------------------------------------------------------------------

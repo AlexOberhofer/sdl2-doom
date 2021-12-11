@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,16 +15,12 @@
 // DESCRIPTION:
 //   Setup a game, startup stuff.
 //
-//-----------------------------------------------------------------------------
 
 
 #ifndef __P_SETUP__
 #define __P_SETUP__
 
 
-#ifdef __GNUG__
-#pragma interface
-#endif
 
 
 // NOT called by W_Ticker. Fixme.
@@ -42,8 +35,3 @@ P_SetupLevel
 void P_Init (void);
 
 #endif
-//-----------------------------------------------------------------------------
-//
-// $Log:$
-//
-//-----------------------------------------------------------------------------

@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -15,12 +12,11 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// $Log:$
-//
 // DESCRIPTION:
 //	Floor animation: raising stairs.
 //
-//-----------------------------------------------------------------------------
+
+
 
 #include "z_zone.h"
 #include "doomdef.h"
@@ -213,8 +209,7 @@ void T_MoveFloor(floormove_t* floor)
 		      floor->crush,0,floor->direction);
     
     if (!(leveltime&7))
-	S_StartSound((mobj_t *)&floor->sector->soundorg,
-		     sfx_stnmov);
+	S_StartSound(&floor->sector->soundorg, sfx_stnmov);
     
     if (res == pastdest)
     {
@@ -244,8 +239,7 @@ void T_MoveFloor(floormove_t* floor)
 	}
 	P_RemoveThinker(&floor->thinker);
 
-	S_StartSound((mobj_t *)&floor->sector->soundorg,
-		     sfx_pstop);
+	S_StartSound(&floor->sector->soundorg, sfx_pstop);
     }
 
 }
@@ -368,7 +362,7 @@ EV_DoFloor
 
 	  case raiseToTexture:
 	  {
-	      int	minsize = MAXINT;
+	      int	minsize = INT_MAX;
 	      side_t*	side;
 				
 	      floor->direction = 1;
@@ -464,8 +458,8 @@ EV_BuildStairs
 
     floormove_t*	floor;
     
-    fixed_t		stairsize;
-    fixed_t		speed;
+    fixed_t		stairsize = 0;
+    fixed_t		speed = 0;
 
     secnum = -1;
     rtn = 0;

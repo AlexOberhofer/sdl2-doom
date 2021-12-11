@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -19,7 +16,6 @@
 //	Printed strings for translation.
 //	English language support (default).
 //
-//-----------------------------------------------------------------------------
 
 #ifndef __D_ENGLSH__
 #define __D_ENGLSH__
@@ -64,7 +60,7 @@
 #define NETEND	"you can't end a netgame!\n\n"PRESSKEY
 #define ENDGAME	"are you sure you want to end the game?\n\n"PRESSYN
 
-#define DOSY		"(press y to quit)"
+#define DOSY		"(press y to quit to dos.)"
 
 #define DETAILHI	"High detail"
 #define DETAILLO	"Low detail"
@@ -695,8 +691,3 @@
 
 
 #endif
-//-----------------------------------------------------------------------------
-//
-// $Log:$
-//
-//-----------------------------------------------------------------------------

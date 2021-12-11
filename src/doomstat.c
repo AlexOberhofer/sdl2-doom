@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -15,25 +12,20 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// $Log:$
-//
 // DESCRIPTION:
 //	Put all global tate variables here.
 //
-//-----------------------------------------------------------------------------
 
-#ifdef __GNUG__
-#pragma implementation "doomstat.h"
-#endif
+#include <stdio.h>
+
 #include "doomstat.h"
 
 
 // Game Mode - identify IWAD as shareware, retail etc.
 GameMode_t gamemode = indetermined;
 GameMission_t	gamemission = doom;
-
-// Language.
-Language_t   language = english;
+GameVersion_t   gameversion = exe_final2;
+char *gamedescription;
 
 // Set if homebrew PWAD stuff has been added.
 boolean	modifiedgame;

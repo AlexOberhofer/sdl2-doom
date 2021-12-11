@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -20,17 +17,17 @@
 //	Does the face/direction indicator animatin.
 //	Does palette indicators as well (red pain/berserk, bright pickup)
 //
-//-----------------------------------------------------------------------------
 
 #ifndef __STSTUFF_H__
 #define __STSTUFF_H__
 
 #include "doomtype.h"
 #include "d_event.h"
+#include "m_cheat.h"
 
 // Size of statusbar.
 // Now sensitive for scaling.
-#define ST_HEIGHT	32*SCREEN_MUL
+#define ST_HEIGHT	32
 #define ST_WIDTH	SCREENWIDTH
 #define ST_Y		(SCREENHEIGHT - ST_HEIGHT)
 
@@ -75,13 +72,18 @@ typedef enum
 } st_chatstateenum_t;
 
 
-boolean ST_Responder(event_t* ev);
 
+extern byte *st_backing_screen;
+extern cheatseq_t cheat_mus;
+extern cheatseq_t cheat_god;
+extern cheatseq_t cheat_ammo;
+extern cheatseq_t cheat_ammonokey;
+extern cheatseq_t cheat_noclip;
+extern cheatseq_t cheat_commercial_noclip;
+extern cheatseq_t cheat_powerup[7];
+extern cheatseq_t cheat_choppers;
+extern cheatseq_t cheat_clev;
+extern cheatseq_t cheat_mypos;
 
 
 #endif
-//-----------------------------------------------------------------------------
-//
-// $Log:$
-//
-//-----------------------------------------------------------------------------

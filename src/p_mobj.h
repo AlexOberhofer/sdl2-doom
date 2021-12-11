@@ -1,9 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
-// $Id:$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +15,6 @@
 // DESCRIPTION:
 //	Map Objects, MObj, definition and handling.
 //
-//-----------------------------------------------------------------------------
 
 
 #ifndef __P_MOBJ__
@@ -42,9 +38,6 @@
 
 
 
-#ifdef __GNUG__
-#pragma interface
-#endif
 
 
 
@@ -289,8 +282,3 @@ typedef struct mobj_s
 
 
 #endif
-//-----------------------------------------------------------------------------
-//
-// $Log:$
-//
-//-----------------------------------------------------------------------------
