@@ -28,15 +28,19 @@ static unsigned char convertToDoomKey(unsigned int key){
     case SDLK_ESCAPE:
       key = KEY_ESCAPE;
       break;
+    case SDLK_a:
     case SDLK_LEFT:
       key = KEY_LEFTARROW;
       break;
+    case SDLK_d:
     case SDLK_RIGHT:
       key = KEY_RIGHTARROW;
       break;
+    case SDLK_w:
     case SDLK_UP:
       key = KEY_UPARROW;
       break;
+    case SDLK_s:
     case SDLK_DOWN:
       key = KEY_DOWNARROW;
       break;
