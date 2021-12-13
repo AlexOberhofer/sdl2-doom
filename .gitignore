@@ -7,3 +7,5 @@
 .settings
 src/build
 sdl2-doom
+*.exe
+*.dll
