@@ -3,6 +3,8 @@
 <p align="center"><b>DISCLAIMER:<br></b> This repository is <b>NOT</b> meant to be used as a replacement for any modern source port. Please look into one of the more popular source ports if that is your goal. The main goal of this repository is my exploration into the doom source code. <br>
 </p>
 
+SDL2-Doom is derived from Chocolate Doom.
+
 ## Screenshots 
 
 <p> 

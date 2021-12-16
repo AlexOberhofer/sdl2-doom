@@ -3,7 +3,7 @@ SDL_LIBS =
 
 CC=x86_64-w64-mingw32-gcc
 CFLAGS+= $(INCLUDES) $(SDL_CFLAGS)
-CFLAGS+=-Wall -DNORMALUNIX -DLINUX
+CFLAGS+=-Wall -DNORMALUNIX 
 LIBS+=-lm -lSDL2
 
 # subdirectory for objects

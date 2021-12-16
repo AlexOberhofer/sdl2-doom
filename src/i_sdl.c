@@ -5,23 +5,22 @@
 
 #include <stdio.h>
 #include <unistd.h>
-
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 
-SDL_Window* window = NULL;
-SDL_Renderer* renderer = NULL;
-SDL_Texture* texture;
-
 #define KEYQUEUE_SIZE 16
+
+static SDL_Window *window = NULL;
+static SDL_Renderer *renderer = NULL;
+static SDL_Texture *texture = NULL;
 
 static unsigned short s_KeyQueue[KEYQUEUE_SIZE];
 static unsigned int s_KeyQueueWriteIndex = 0;
 static unsigned int s_KeyQueueReadIndex = 0;
 
-static unsigned char convertToDoomKey(unsigned int key){
+static unsigned char toDoomKey(unsigned int key){
   switch (key)
-    {
+  {
     case SDLK_RETURN:
       key = KEY_ENTER;
       break;
@@ -55,6 +54,13 @@ static unsigned char convertToDoomKey(unsigned int key){
     case SDLK_RSHIFT:
       key = KEY_RSHIFT;
       break;
+    case SDL_BUTTON_RIGHT:
+    case SDL_BUTTON_LEFT:
+      key = KEY_FIRE;
+      break;
+    case SDL_BUTTON_MIDDLE:
+      key = KEY_USE;
+      break;
     default:
       key = tolower(key);
       break;
@@ -63,98 +69,121 @@ static unsigned char convertToDoomKey(unsigned int key){
   return key;
 }
 
-static void addKeyToQueue(int pressed, unsigned int keyCode){
-  unsigned char key = convertToDoomKey(keyCode);
-
+static void queueKeyPress(int pressed, unsigned int keyCode)
+{
+  unsigned char key = toDoomKey(keyCode);
   unsigned short keyData = (pressed << 8) | key;
 
   s_KeyQueue[s_KeyQueueWriteIndex] = keyData;
   s_KeyQueueWriteIndex++;
   s_KeyQueueWriteIndex %= KEYQUEUE_SIZE;
 }
-static void handleKeyInput(){
+
+static void handleKeyInput() {
   SDL_Event e;
-  while (SDL_PollEvent(&e)){
-    if (e.type == SDL_QUIT){
+
+  while (SDL_PollEvent(&e))
+  {
+    if (e.type == SDL_QUIT)
+    {
       puts("Quit requested");
       atexit(SDL_Quit);
       exit(1);
     }
-    if (e.type == SDL_KEYDOWN) {
-      //KeySym sym = XKeycodeToKeysym(s_Display, e.xkey.keycode, 0);
+
+    if (e.type == SDL_KEYDOWN) 
+    {
       //printf("KeyPress:%d sym:%d\n", e.xkey.keycode, sym);
-      addKeyToQueue(1, e.key.keysym.sym);
-    } else if (e.type == SDL_KEYUP) {
-      //KeySym sym = XKeycodeToKeysym(s_Display, e.xkey.keycode, 0);
+      queueKeyPress(1, e.key.keysym.sym);
+    } 
+    else if (e.type == SDL_KEYUP) 
+    {
       //printf("KeyRelease:%d sym:%d\n", e.xkey.keycode, sym);
-      addKeyToQueue(0, e.key.keysym.sym);
+      queueKeyPress(0, e.key.keysym.sym);
     }
+    else if(e.type == SDL_MOUSEBUTTONDOWN) 
+    {
+      //printf("SDL_MOUSE_PRESSED: %d\n", e.button.button);
+      queueKeyPress(1, e.button.button);
+    }
+    else if(e.type == SDL_MOUSEBUTTONUP)
+    {
+      //printf("SDL_MOUSE_RELEASED: %d\n", e.button.button);
+      queueKeyPress(0, e.button.button);
+    }
+
   }
+
 }
 
 
-void DG_Init(){
-  window = SDL_CreateWindow("DOOM",
-                            SDL_WINDOWPOS_UNDEFINED,
-                            SDL_WINDOWPOS_UNDEFINED,
-                            DOOMGENERIC_RESX,
-                            DOOMGENERIC_RESY,
-                            SDL_WINDOW_SHOWN
-                            );
+void DG_Init() 
+{
+  	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0)
+	  {
+          printf("SDL_Init failed: %s\n", SDL_GetError());
+          atexit(SDL_Quit);
+          exit(1);
+    }
+    else 
+    {
+        window = SDL_CreateWindow("DOOM", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
+            DOOMGENERIC_RESX, DOOMGENERIC_RESY, SDL_WINDOW_SHOWN);
+        renderer =  SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+        texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB888, 
+            SDL_TEXTUREACCESS_TARGET, DOOMGENERIC_RESX, DOOMGENERIC_RESY);
+    }
 
-  // Setup renderer
-  renderer =  SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED);
-  // Clear winow
-  SDL_RenderClear( renderer );
-  // Render the rect to the screen
-  SDL_RenderPresent(renderer);
-
-  texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, DOOMGENERIC_RESX, DOOMGENERIC_RESY);
+    SDL_RenderClear(renderer);
+    SDL_RenderPresent(renderer);
 }
 
 void DG_DrawFrame()
 {
-  SDL_UpdateTexture(texture, NULL, DG_ScreenBuffer, DOOMGENERIC_RESX*sizeof(uint32_t));
+    SDL_UpdateTexture(texture, NULL, DG_ScreenBuffer, DOOMGENERIC_RESX * sizeof(uint32_t));
+    SDL_RenderClear(renderer);
+    SDL_RenderCopy(renderer, texture, NULL, NULL);
+    SDL_RenderPresent(renderer);
 
-  SDL_RenderClear(renderer);
-  SDL_RenderCopy(renderer, texture, NULL, NULL);
-  SDL_RenderPresent(renderer);
-
-  handleKeyInput();
+    handleKeyInput();
 }
 
 void DG_SleepMs(uint32_t ms)
 {
-  SDL_Delay(ms);
+    SDL_Delay(ms);
 }
 
 uint32_t DG_GetTicksMs()
 {
-  return SDL_GetTicks();
+    return SDL_GetTicks();
 }
 
 int DG_GetKey(int* pressed, unsigned char* doomKey)
 {
-  if (s_KeyQueueReadIndex == s_KeyQueueWriteIndex){
-    //key queue is empty
-    return 0;
-  }else{
-    unsigned short keyData = s_KeyQueue[s_KeyQueueReadIndex];
-    s_KeyQueueReadIndex++;
-    s_KeyQueueReadIndex %= KEYQUEUE_SIZE;
+    uint8_t k_pressed = 0;
 
-    *pressed = keyData >> 8;
-    *doomKey = keyData & 0xFF;
+    if (s_KeyQueueReadIndex == s_KeyQueueWriteIndex)
+    {
+        k_pressed = 0;
+    } 
+    else
+    {
+        unsigned short keyData = s_KeyQueue[s_KeyQueueReadIndex];
+        s_KeyQueueReadIndex++;
+        s_KeyQueueReadIndex %= KEYQUEUE_SIZE;
+        *pressed = keyData >> 8;
+        *doomKey = keyData & 0xFF;
 
-    return 1;
-  }
+        k_pressed = 1;
+    }
 
-  return 0;
+    return k_pressed;
 }
 
 void DG_SetWindowTitle(const char * title)
 {
-  if (window != NULL){
-    SDL_SetWindowTitle(window, title);
-  }
+    if (window != NULL) 
+    {
+        SDL_SetWindowTitle(window, title);
+    }
 }

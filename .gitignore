@@ -9,3 +9,6 @@ src/build
 sdl2-doom
 *.exe
 *.dll
+.idea
+*.iml
+.vscode
