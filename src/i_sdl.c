@@ -18,7 +18,8 @@ static unsigned short s_KeyQueue[KEYQUEUE_SIZE];
 static unsigned int s_KeyQueueWriteIndex = 0;
 static unsigned int s_KeyQueueReadIndex = 0;
 
-static unsigned char toDoomKey(unsigned int key){
+static unsigned char toDoomKey(unsigned int key)
+{
   switch (key)
   {
     case SDLK_RETURN:
@@ -79,7 +80,8 @@ static void queueKeyPress(int pressed, unsigned int keyCode)
   s_KeyQueueWriteIndex %= KEYQUEUE_SIZE;
 }
 
-static void handleKeyInput() {
+static void handleKeyInput() 
+{
   SDL_Event e;
 
   while (SDL_PollEvent(&e))
@@ -119,7 +121,7 @@ static void handleKeyInput() {
 
 void DG_Init() 
 {
-  	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0)
+  	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	  {
           printf("SDL_Init failed: %s\n", SDL_GetError());
           atexit(SDL_Quit);

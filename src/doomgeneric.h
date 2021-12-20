@@ -4,12 +4,10 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#define DOOMGENERIC_RESX 640
-#define DOOMGENERIC_RESY 400
-
+#define DOOMGENERIC_RESX 320 * 3 //FIXME: Do scaling via arg in video interface
+#define DOOMGENERIC_RESY 200 * 3
 
 extern uint32_t* DG_ScreenBuffer;
-
 
 void DG_Init();
 void DG_DrawFrame();

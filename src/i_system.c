@@ -21,8 +21,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
-
-#include "SDL2/SDL.h"
+#include <SDL2/SDL.h>
 
 #include "config.h"
 #include "deh_str.h"
@@ -35,7 +34,6 @@
 #include "i_timer.h"
 #include "i_video.h"
 #include "i_system.h"
-
 #include "w_wad.h"
 #include "z_zone.h"
 
@@ -193,7 +191,7 @@ void I_PrintStartupBanner(char *gamedescription)
 
 boolean I_ConsoleStdout(void)
 {
-    return isatty(fileno(stdout));
+    return 0;
 }
 
 //
@@ -232,8 +230,7 @@ void I_Quit (void)
         entry = entry->next;
     }
 
-    SDL_Quit();
-
+    atexit(SDL_Quit);
     exit(0);
 }
 
@@ -252,7 +249,6 @@ void I_Error (char *error, ...)
 
     if (already_quitting)
     {
-        fprintf(stderr, "Warning: recursive call to I_Error detected.\n");
         exit(-1);
     }
     else
@@ -274,32 +270,19 @@ void I_Error (char *error, ...)
     M_vsnprintf(msgbuf, sizeof(msgbuf), error, argptr);
     va_end(argptr);
 
-    // Shutdown. Here might be other errors.
-
-    entry = exit_funcs;
-
-    while (entry != NULL)
-    {
-        if (entry->run_on_error)
-        {
-            entry->func();
-        }
-
-        entry = entry->next;
-    }
-
     exit_gui_popup = !M_ParmExists("-nogui");
 
     // Pop up a GUI dialog box to show the error message, if the
     // game was not run from the console (and the user will
     // therefore be unable to otherwise see the message).
-    if (exit_gui_popup && !I_ConsoleStdout())
+    if (exit_gui_popup)
     {
-        //FIXME: Restore exit message dialog box
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "", msgbuf, NULL);
     }
 
-    SDL_Quit();
+    atexit(SDL_Quit);
     exit(1);
+
 }
 
 //

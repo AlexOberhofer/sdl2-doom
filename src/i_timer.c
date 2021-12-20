@@ -18,12 +18,10 @@
 
 #include "i_timer.h"
 #include "doomtype.h"
-
 #include "doomgeneric.h"
 
 #include <stdarg.h>
-//#include <sys/time.h>
-//#include <unistd.h>
+#include <SDL2/SDL.h>
 
 
 //
@@ -74,9 +72,6 @@ int I_GetTimeMS(void)
 
 void I_Sleep(int ms)
 {
-    //SDL_Delay(ms);
-    //usleep (ms * 1000);
-
 	DG_SleepMs(ms);
 }
 
@@ -88,8 +83,11 @@ void I_WaitVBL(int count)
 
 void I_InitTimer(void)
 {
-    // initialize timer
-
-    //SDL_Init(SDL_INIT_TIMER);
+    if (SDL_Init(SDL_INIT_TIMER) < 0)
+	{
+          printf("SDL_Init failed: %s\n", SDL_GetError());
+          atexit(SDL_Quit);
+          exit(1);
+    }
 }
 
