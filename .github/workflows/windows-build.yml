@@ -18,7 +18,7 @@ jobs:
     - name: toolchain setup
       run: sudo apt-get install mingw-w64
     - name: sdl setup script
-      run: ./mingw-sdl-setup.sh
+      run: chmod a+x ./mingw-sdl-setup.sh && ./mingw-sdl-setup.sh
     - name: Build Windows exe
       run: ./build_windows.sh
     - uses: actions/upload-artifact@v2
