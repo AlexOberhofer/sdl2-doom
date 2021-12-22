@@ -1,0 +1,28 @@
+name: Windows MinGW-w64
+
+on:
+  push:
+    branches: [ master, development ]
+  pull_request:
+    branches: [ master, development ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: update
+      run: sudo apt-get update
+    - name: toolchain setup
+      run: sudo apt-get install mingw-w64
+    - name: sdl setup script
+      run: ./mingw-sdl-setup.sh
+    - name: Build Windows exe
+      run: ./build_windows.sh
+    - uses: actions/upload-artifact@v2
+      with:
+        name: sdl2-doom-latest
+        path: ./src/sdl2-doom.exe
+      

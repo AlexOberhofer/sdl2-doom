@@ -48,8 +48,7 @@ Other keys may work. Mileage may vary.
 This is a source port of the ID Software source release of DOOM. This repository is used as an educational tool for myself. Anyone 
 interested in hacking on this project is more than welcome to submit a pull request.
 
-This project is based on the doomgeneric source port.
-
+This branch was forked from the repository:
 [doomgeneric](https://github.com/ozkl/doomgeneric)
 
 ## License 
