@@ -33,18 +33,21 @@
 #include "tables.h"
 #include "doomkeys.h"
 
-#include "doomgeneric.h"
-
 #include <stdbool.h>
 #include <stdlib.h>
-
 #include <fcntl.h>
-
 #include <stdarg.h>
+#include <SDL2/SDL.h>
 
-#include <sys/types.h>
+#define SDL_RESX 320 * 3 //FIXME: Do scaling via arg in video interface
+#define SDL_RESY 200 * 3
 
-//#define CMAP256
+uint32_t *fb_SDL;
+
+static SDL_Window *window = NULL;
+static SDL_Renderer *renderer = NULL;
+static SDL_Texture *texture = NULL;
+
 
 struct FB_BitField
 {
@@ -176,8 +179,8 @@ void I_InitGraphics (void)
     int i;
 
 	memset(&s_Fb, 0, sizeof(struct FB_ScreenInfo));
-	s_Fb.xres = DOOMGENERIC_RESX;
-	s_Fb.yres = DOOMGENERIC_RESY;
+	s_Fb.xres = SDL_RESX;
+	s_Fb.yres = SDL_RESY;
 	s_Fb.xres_virtual = s_Fb.xres;
 	s_Fb.yres_virtual = s_Fb.yres;
 	s_Fb.bits_per_pixel = 32;
@@ -197,7 +200,8 @@ void I_InitGraphics (void)
             s_Fb.xres, s_Fb.yres, s_Fb.xres_virtual, s_Fb.yres_virtual, s_Fb.bits_per_pixel);
 
     printf("I_InitGraphics: framebuffer: RGBA: %d%d%d%d, red_off: %d, green_off: %d, blue_off: %d, transp_off: %d\n",
-            s_Fb.red.length, s_Fb.green.length, s_Fb.blue.length, s_Fb.transp.length, s_Fb.red.offset, s_Fb.green.offset, s_Fb.blue.offset, s_Fb.transp.offset);
+            s_Fb.red.length, s_Fb.green.length, s_Fb.blue.length, s_Fb.transp.length, s_Fb.red.offset, s_Fb.green.offset, 
+            s_Fb.blue.offset, s_Fb.transp.offset);
 
     printf("I_InitGraphics: DOOM screen size: w x h: %d x %d\n", SCREENWIDTH, SCREENHEIGHT);
 
@@ -220,13 +224,45 @@ void I_InitGraphics (void)
 
 	screenvisible = true;
 
+    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	{
+        printf("I_InitGraphics: SDL_Init failed: %s\n", SDL_GetError());
+        atexit(SDL_Quit);
+        exit(1);
+    }
+    else 
+    {
+        window = SDL_CreateWindow("DOOM", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
+            SDL_RESX, SDL_RESY, SDL_WINDOW_SHOWN);
+        renderer =  SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+        texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, 
+            SDL_RESX, SDL_RESY);
+
+        fb_SDL = malloc(SDL_RESX * SDL_RESY * sizeof(uint32_t));    
+
+        SDL_RenderClear(renderer);
+        SDL_RenderPresent(renderer);
+
+        printf("I_InitGraphics: Init SDL video.\n");
+    }
+
     extern int I_InitInput(void);
     I_InitInput();
 }
 
 void I_ShutdownGraphics (void)
 {
-	Z_Free (I_VideoBuffer);
+    if(texture)
+        SDL_DestroyTexture(texture);
+    
+    if(renderer)
+        SDL_DestroyRenderer(renderer);
+
+    if(window);    
+        SDL_DestroyWindow(window);
+
+    Z_Free(I_VideoBuffer);
+    free(fb_SDL);
 }
 
 void I_StartFrame (void)
@@ -254,8 +290,8 @@ void I_FinishUpdate (void)
     unsigned char *line_in, *line_out;
 
     /* Offsets in case FB is bigger than DOOM */
-    /* 600 = s_Fb heigt, 200 screenheight */
-    /* 600 = s_Fb heigt, 200 screenheight */
+    /* 600 = s_Fb height, 200 screenheight */
+    /* 600 = s_Fb height, 200 screenheight */
     /* 2048 =s_Fb width, 320 screenwidth */
     y_offset     = (((s_Fb.yres - (SCREENHEIGHT * fb_scaling)) * s_Fb.bits_per_pixel/8)) / 2;
     x_offset     = (((s_Fb.xres - (SCREENWIDTH  * fb_scaling)) * s_Fb.bits_per_pixel/8)) / 2; // XXX: siglent FB hack: /4 instead of /2, since it seems to handle the resolution in a funny way
@@ -264,7 +300,7 @@ void I_FinishUpdate (void)
 
     /* DRAW SCREEN */
     line_in  = (unsigned char *) I_VideoBuffer;
-    line_out = (unsigned char *) DG_ScreenBuffer;
+    line_out = (unsigned char *) fb_SDL;
 
     y = SCREENHEIGHT;
 
@@ -273,22 +309,17 @@ void I_FinishUpdate (void)
         int i;
         for (i = 0; i < fb_scaling; i++) {
             line_out += x_offset;
-#ifdef CMAP256
-            for (fb_scaling == 1) {
-                memcpy(line_out, line_in, SCREENWIDTH); /* fb_width is bigger than Doom SCREENWIDTH... */
-            } else {
-                //XXX FIXME fb_scaling support!
-            }
-#else
             //cmap_to_rgb565((void*)line_out, (void*)line_in, SCREENWIDTH);
             cmap_to_fb((void*)line_out, (void*)line_in, SCREENWIDTH);
-#endif
             line_out += (SCREENWIDTH * fb_scaling * (s_Fb.bits_per_pixel/8)) + x_offset_end;
         }
         line_in += SCREENWIDTH;
     }
 
-	DG_DrawFrame();
+	SDL_UpdateTexture(texture, NULL, fb_SDL, SDL_RESX * sizeof(uint32_t));
+    SDL_RenderClear(renderer);
+    SDL_RenderCopy(renderer, texture, NULL, NULL);
+    SDL_RenderPresent(renderer);
 }
 
 //
@@ -381,9 +412,12 @@ void I_EndRead (void)
 {
 }
 
-void I_SetWindowTitle (char *title)
+void I_SetWindowTitle(char *title)
 {
-	DG_SetWindowTitle(title);
+	if (window != NULL) 
+    {
+        SDL_SetWindowTitle(window, title);
+    }
 }
 
 void I_GraphicsCheckCommandLine (void)

@@ -173,5 +173,6 @@ void I_GetEvent(void)
 
 void I_InitInput(void)
 {
+    
 }
 
