@@ -12,3 +12,5 @@ sdl2-doom
 .idea
 *.iml
 .vscode
+SDL2-*/
+README-SDL.txt

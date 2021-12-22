@@ -1,10 +1,10 @@
-SDL_CFLAGS = -D_THREAD_SAFE -I/usr/include/SDL2
-SDL_LIBS =
+SDL_CFLAGS = -D_THREAD_SAFE -I/usr/include/SDL2 -I../SDL2-2.0.18/x86_64-w64-mingw32/include 
+SDL_LIBS = 
 
 CC=x86_64-w64-mingw32-gcc
 CFLAGS+= $(INCLUDES) $(SDL_CFLAGS)
 CFLAGS+=-Wall -DNORMALUNIX 
-LIBS+=-lm -lSDL2
+LIBS+=-lm -lSDL2 -L../SDL2-2.0.18/x86_64-w64-mingw32/lib
 
 # subdirectory for objects
 OBJDIR=build

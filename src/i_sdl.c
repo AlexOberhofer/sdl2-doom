@@ -14,6 +14,8 @@ static unsigned short s_KeyQueue[KEYQUEUE_SIZE];
 static unsigned int s_KeyQueueWriteIndex = 0;
 static unsigned int s_KeyQueueReadIndex = 0;
 
+
+//TODO: Convert to key-map
 static unsigned char toDoomKey(unsigned int key)
 {
   switch (key)
