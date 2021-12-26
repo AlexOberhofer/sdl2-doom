@@ -80,6 +80,7 @@ void I_WaitVBL(int count)
 
 void I_InitTimer(void)
 {
+    printf("I_InitTimer: Setting up timer.\n");
     if (SDL_Init(SDL_INIT_TIMER) < 0)
 	{
           printf("SDL_Init failed: %s\n", SDL_GetError());

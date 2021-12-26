@@ -19,7 +19,7 @@
 #undef HAVE_LIBI386
 
 /* Define to 1 if you have the `m' library (-lm). */
-#undef HAVE_LIBM
+#define HAVE_LIBM 1
 
 /* Define to 1 if you have the `png' library (-lpng). */
 #undef HAVE_LIBPNG
@@ -70,10 +70,10 @@
 #undef PACKAGE_BUGREPORT
 
 /* Define to the full name of this package. */
-#define PACKAGE_NAME "SDL2-Doom - Based on Doom Generic"
+#define PACKAGE_NAME "SDL2-Doom"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "SDL2-Doom - Based on Doom Generic 0.1"
+#define PACKAGE_STRING "SDL2-Doom"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "sdl2-doom.tar"

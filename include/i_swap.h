@@ -41,5 +41,17 @@
 #define SYS_BIG_ENDIAN
 #endif
 
+// cosmito from lsdldoom
+#define doom_swap_s(x) \
+        ((short int)((((unsigned short int)(x) & 0x00ff) << 8) | \
+                              (((unsigned short int)(x) & 0xff00) >> 8))) 
+
+
+#if ( SDL_BYTEORDER == SDL_BIG_ENDIAN )
+#define doom_wtohs(x) doom_swap_s(x)
+#else
+#define doom_wtohs(x) (short int)(x)
+#endif
+
 #endif
 
