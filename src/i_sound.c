@@ -18,7 +18,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef FEATURE_SOUND
 #include "SDL2/SDL_mixer.h"
+#endif
 
 #include "config.h"
 #include "doomfeatures.h"
@@ -87,7 +89,9 @@ static int snd_mport = 0;
 
 static sound_module_t *sound_modules[] = 
 {
+    #ifdef FEATURE_SOUND
     &sound_sdl_module,
+    #endif
     NULL,
 };
 

@@ -33,7 +33,7 @@
 
 // Enables sound output
 
-#undef FEATURE_SOUND
+//#undef FEATURE_SOUND amo: moved to makefile
 
 #endif /* #ifndef DOOM_FEATURES_H */
 
