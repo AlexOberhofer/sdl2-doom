@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <SDL2/SDL.h>
+#include <ctype.h>
 
 #define KEYQUEUE_SIZE 16
 
@@ -126,16 +127,6 @@ static void handleKeyInput()
 
   }
 
-}
-
-void DG_SleepMs(uint32_t ms)
-{
-    SDL_Delay(ms);
-}
-
-uint32_t DG_GetTicksMs()
-{
-    return SDL_GetTicks();
 }
 
 int DG_GetKey(int* pressed, unsigned char* doomKey)

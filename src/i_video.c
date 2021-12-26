@@ -258,7 +258,7 @@ void I_ShutdownGraphics (void)
     if(renderer)
         SDL_DestroyRenderer(renderer);
 
-    if(window);    
+    if(window)    
         SDL_DestroyWindow(window);
 
     Z_Free(I_VideoBuffer);

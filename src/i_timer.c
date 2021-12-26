@@ -18,9 +18,9 @@
 
 #include "i_timer.h"
 #include "doomtype.h"
-#include "doomgeneric.h"
 
 #include <stdarg.h>
+#include <stdio.h>
 #include <SDL2/SDL.h>
 
 
@@ -28,13 +28,12 @@
 // I_GetTime
 // returns time in 1/35th second tics
 //
-
 static uint32_t basetime = 0;
 
 
 int I_GetTicks(void)
 {
-	return DG_GetTicksMs();
+	return SDL_GetTicks();
 }
 
 int  I_GetTime (void)
@@ -55,7 +54,6 @@ int  I_GetTime (void)
 //
 // Same as I_GetTime, but returns time in milliseconds
 //
-
 int I_GetTimeMS(void)
 {
     uint32_t ticks;
@@ -69,10 +67,9 @@ int I_GetTimeMS(void)
 }
 
 // Sleep for a specified number of ms
-
 void I_Sleep(int ms)
 {
-	DG_SleepMs(ms);
+	SDL_Delay(ms);
 }
 
 void I_WaitVBL(int count)
