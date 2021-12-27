@@ -5,7 +5,7 @@
 This is a source port of the ID Software source release of DOOM. This repository is used as an educational tool for myself. Anyone 
 interested in hacking on this project is more than welcome to submit a pull request.
 
-This fork focuses on an SDL2 implementation of DOOM.
+This fork focuses on an SDL2 implementation of DOOM. Currently featuring an SDL2 renderer, sound API, and input via keyboard.
 
 ## Build Status
 
