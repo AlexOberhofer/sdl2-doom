@@ -158,9 +158,9 @@ static void InitMusicModule(void)
 {
     int i;
 
-    music_module = NULL;
+    music_module = &music_sdl_module; return;
 
-    for (i=0; music_modules[i] != NULL; ++i)
+    /*for (i=0; music_modules[i] != NULL; ++i)
     {
         // Is the music device in the list of devices supported
         // by this module?
@@ -177,7 +177,7 @@ static void InitMusicModule(void)
                 return;
             }
         }
-    }
+    }*/
 }
 
 //
@@ -353,6 +353,10 @@ void I_PrecacheSounds(sfxinfo_t *sounds, int num_sounds)
 
 void I_InitMusic(void)
 {
+    if(music_module != NULL)
+    {
+        music_module->Init();
+    }
 }
 
 void I_ShutdownMusic(void)
