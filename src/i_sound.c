@@ -128,19 +128,56 @@ static boolean SndDeviceInList(snddevice_t device, snddevice_t *list,
 
 static void InitSfxModule(boolean use_sfx_prefix)
 {
-    sound_module = &sound_sdl_module;
+    int i;
 
-    return;
+    sound_module = NULL;
+
+    for (i=0; sound_modules[i] != NULL; ++i)
+    {
+        // Is the sfx device in the list of devices supported by
+        // this module?
+
+        if (SndDeviceInList(snd_sfxdevice, 
+                            sound_modules[i]->sound_devices,
+                            sound_modules[i]->num_sound_devices))
+        {
+            // Initialize the module
+
+            if (sound_modules[i]->Init(use_sfx_prefix))
+            {
+                sound_module = sound_modules[i];
+                return;
+            }
+        }
+    }
 }
 
 // Initialize music according to snd_musicdevice.
 
 static void InitMusicModule(void)
 {
-    
-    music_module = &music_sdl_module; 
-    
-    return;
+    int i;
+
+    music_module = NULL;
+
+    for (i=0; music_modules[i] != NULL; ++i)
+    {
+        // Is the music device in the list of devices supported
+        // by this module?
+
+        if (SndDeviceInList(snd_musicdevice, 
+                            music_modules[i]->sound_devices,
+                            music_modules[i]->num_sound_devices))
+        {
+            // Initialize the module
+
+            if (music_modules[i]->Init())
+            {
+                music_module = music_modules[i];
+                return;
+            }
+        }
+    }
 }
 
 //
@@ -316,18 +353,11 @@ void I_PrecacheSounds(sfxinfo_t *sounds, int num_sounds)
 
 void I_InitMusic(void)
 {
-    if(music_module != NULL) 
-    {
-        music_module->Init();
-    }
 }
 
 void I_ShutdownMusic(void)
 {
-    if(music_module != NULL)
-    {
-        music_module->Shutdown();
-    }
+
 }
 
 void I_SetMusicVolume(int volume)
