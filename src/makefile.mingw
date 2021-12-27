@@ -1,4 +1,4 @@
-SDL_CFLAGS = -D_THREAD_SAFE -I/usr/include/SDL2 -I../SDL2-2.0.18/x86_64-w64-mingw32/include 
+SDL_CFLAGS = -D_THREAD_SAFE -I/usr/include/SDL2 -I../SDL2-2.0.18/x86_64-w64-mingw32/include
 SDL_LIBS = 
 
 INCLUDES=-I../include
@@ -6,7 +6,7 @@ INCLUDES=-I../include
 CC=x86_64-w64-mingw32-gcc
 CFLAGS+= $(INCLUDES) $(SDL_CFLAGS)
 CFLAGS+=-Wall -DNORMALUNIX -DFEATURE_SOUND
-LIBS+=-lm -lSDL2 -L../SDL2-2.0.18/x86_64-w64-mingw32/lib -lSDL2_mixer
+LIBS+=-lm -lSDL2 -L../SDL2-2.0.18/x86_64-w64-mingw32/lib -L../SDL2_mixer-2.0.4/x86_64-w64-mingw32/lib -lSDL2_mixer `sdl2-config --cflags --libs`
 
 # subdirectory for objects
 OBJDIR=build

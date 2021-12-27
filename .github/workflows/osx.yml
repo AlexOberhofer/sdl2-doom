@@ -16,6 +16,6 @@ jobs:
     - name: brew install
       run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
     - name: sdl2 install
-      run: brew install sdl2
+      run: brew install sdl2 && brew install sdl2_mixer
     - name: make
       run: ./build_nix.sh
