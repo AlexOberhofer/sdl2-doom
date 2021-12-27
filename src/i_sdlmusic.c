@@ -27,7 +27,7 @@
 #include "config.h"
 #include "doomtype.h"
 #include "memio.h"
-#include "mmus2mid.h"
+#include "mus2mid.h"
 
 #include "deh_str.h"
 #include "gusconf.h"
