@@ -65,7 +65,7 @@ int snd_sfxdevice = SNDDEVICE_SB;
 extern void I_InitTimidityConfig(void);
 extern sound_module_t sound_sdl_module;
 extern sound_module_t sound_pcsound_module;
-//extern music_module_t music_sdl_module;
+extern music_module_t music_sdl_module;
 extern music_module_t music_opl_module;
 
 // For OPL module:
@@ -99,7 +99,9 @@ static sound_module_t *sound_modules[] =
 
 static music_module_t *music_modules[] =
 {
-    //&music_sdl_module,
+    #ifdef FEATURE_SOUND
+    &music_sdl_module,
+    #endif
     NULL,
 };
 
@@ -155,8 +157,6 @@ static void InitSfxModule(boolean use_sfx_prefix)
 static void InitMusicModule(void)
 {
     int i;
-
-    return;
 
     music_module = NULL;
 
@@ -226,7 +226,7 @@ void I_InitSound(boolean use_sfx_prefix)
          && (snd_musicdevice == SNDDEVICE_GENMIDI
           || snd_musicdevice == SNDDEVICE_GUS))
         {
-            //I_InitTimidityConfig();
+            I_InitTimidityConfig();
         }
 
         if (!nosfx)
@@ -430,6 +430,7 @@ boolean I_MusicIsPlaying(void)
     {
         return false;
     }
+    
 }
 
 void I_BindSoundVariables(void)
