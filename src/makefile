@@ -37,7 +37,6 @@ SRC_DOOM = i_main.o \
 			i_timer.o  \
 			i_input.o   \
 			i_video.o   \
-			i_sdl.o   \
 			mus2mid.o   \
 			memio.o  \
 			m_argv.o  \
