@@ -16,3 +16,5 @@ SDL2-*/
 SDL2_*/
 README-SDL.txt
 *.zip
+build/*
+cmake-*/
