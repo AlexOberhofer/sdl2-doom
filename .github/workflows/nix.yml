@@ -22,5 +22,9 @@ jobs:
     - name: install sdl2 mixer
       run:
         sudo apt-get install libsdl2-mixer-dev
+    - name: install cmake
+      run:
+        sudo apt-get install cmake
+
     - name: make
-      run: ./build_nix.sh
+      run: mkdir build && cd build && cmake ../ && make
