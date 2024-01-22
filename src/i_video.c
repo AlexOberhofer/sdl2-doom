@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id:$
@@ -63,7 +63,7 @@ struct FB_ScreenInfo
 	uint32_t yres_virtual;
 
 	uint32_t bits_per_pixel;		/* guess what			*/
-	
+
 							/* >1 = FOURCC			*/
 	struct FB_BitField red;		/* bitfield in s_Fb mem if true color, */
 	struct FB_BitField green;	/* else only length is significant */
@@ -134,7 +134,7 @@ void cmap_to_rgb565(uint16_t * out, uint8_t * in, int in_pixels)
 
     for (i = 0; i < in_pixels; i++)
     {
-        c = colors[*in]; 
+        c = colors[*in];
         r = ((uint16_t)(c.r >> 3)) << 11;
         g = ((uint16_t)(c.g >> 2)) << 5;
         b = ((uint16_t)(c.b >> 3)) << 0;
@@ -194,13 +194,13 @@ void I_InitGraphics (void)
 	s_Fb.green.offset = 8;
 	s_Fb.red.offset = 16;
 	s_Fb.transp.offset = 24;
-	
+
 
     printf("I_InitGraphics: framebuffer: x_res: %d, y_res: %d, x_virtual: %d, y_virtual: %d, bpp: %d\n",
             s_Fb.xres, s_Fb.yres, s_Fb.xres_virtual, s_Fb.yres_virtual, s_Fb.bits_per_pixel);
 
     printf("I_InitGraphics: framebuffer: RGBA: %d%d%d%d, red_off: %d, green_off: %d, blue_off: %d, transp_off: %d\n",
-            s_Fb.red.length, s_Fb.green.length, s_Fb.blue.length, s_Fb.transp.length, s_Fb.red.offset, s_Fb.green.offset, 
+            s_Fb.red.length, s_Fb.green.length, s_Fb.blue.length, s_Fb.transp.length, s_Fb.red.offset, s_Fb.green.offset,
             s_Fb.blue.offset, s_Fb.transp.offset);
 
     printf("I_InitGraphics: DOOM screen size: w x h: %d x %d\n", SCREENWIDTH, SCREENHEIGHT);
@@ -230,15 +230,15 @@ void I_InitGraphics (void)
         atexit(SDL_Quit);
         exit(1);
     }
-    else 
+    else
     {
-        window = SDL_CreateWindow("DOOM", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
-            SDL_RESX, SDL_RESY, SDL_WINDOW_SHOWN);
+        window = SDL_CreateWindow("DOOM", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+            SDL_RESX, SDL_RESY, SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE);
         renderer =  SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-        texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, 
+        texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET,
             SDL_RESX, SDL_RESY);
 
-        fb_SDL = malloc(SDL_RESX * SDL_RESY * sizeof(uint32_t));    
+        fb_SDL = malloc(SDL_RESX * SDL_RESY * sizeof(uint32_t));
 
         SDL_RenderClear(renderer);
         SDL_RenderPresent(renderer);
@@ -254,11 +254,11 @@ void I_ShutdownGraphics (void)
 {
     if(texture)
         SDL_DestroyTexture(texture);
-    
+
     if(renderer)
         SDL_DestroyRenderer(renderer);
 
-    if(window)    
+    if(window)
         SDL_DestroyWindow(window);
 
     Z_Free(I_VideoBuffer);
@@ -353,7 +353,7 @@ void I_SetPalette (byte* palette)
 
 	//	palette += 3;
 	//}
-    
+
 
     /* performance boost:
      * map to the right pixel format over here! */
@@ -414,10 +414,30 @@ void I_EndRead (void)
 
 void I_SetWindowTitle(char *title)
 {
-	if (window != NULL) 
+	if (window != NULL)
     {
         SDL_SetWindowTitle(window, title);
     }
+}
+
+void I_RescaleWindow (int newWidth, int newHeight)
+{
+    float scaleX = (float)newWidth / (float)SCREENWIDTH;
+    float scaleY = (float)newHeight / (float)SCREENHEIGHT;
+    float scale = fminf(scaleX, scaleY);
+
+    /* Calculate the new scaled dimensions */
+    int scaledWidth = (float)SCREENWIDTH * scale;
+    int scaledHeight = (float)SCREENHEIGHT * scale;
+
+    /* Calculate centered positioning offset */
+    int offsetX = (int)((newWidth - scaledWidth) / scale / 2.0f);
+    int offsetY = (int)((newHeight - scaledHeight) / scale / 2.0f);
+
+    SDL_Rect viewport = {offsetX, offsetY, SCREENWIDTH, SCREENHEIGHT};
+
+    SDL_RenderSetScale(renderer, scale, scale);
+    SDL_RenderSetViewport(renderer, &viewport);
 }
 
 void I_GraphicsCheckCommandLine (void)
