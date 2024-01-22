@@ -113,6 +113,7 @@ void I_BeginRead (void);
 
 void I_SetWindowTitle(char *title);
 void I_RescaleWindow(int newWidth, int newHeight);
+void I_ToggleWindowFullscreenDesktop (void);
 
 void I_CheckIsScreensaver(void);
 void I_SetGrabMouseCallback(grabmouse_callback_t func);

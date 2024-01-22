@@ -440,6 +440,11 @@ void I_RescaleWindow (int newWidth, int newHeight)
     SDL_RenderSetViewport(renderer, &viewport);
 }
 
+void I_ToggleWindowFullscreenDesktop (void)
+{
+    SDL_SetWindowFullscreen(window, SDL_GetWindowFlags(window) ^ SDL_WINDOW_FULLSCREEN_DESKTOP);
+}
+
 void I_GraphicsCheckCommandLine (void)
 {
 }

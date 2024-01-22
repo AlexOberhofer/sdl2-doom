@@ -148,6 +148,12 @@ static void SDL_PollEvents()
     }
     else if (e.type == SDL_KEYUP)
     {
+      /* Toggle fullscreen with `ALT+F` */
+      if (e.key.keysym.sym == SDLK_f
+       && e.key.keysym.mod & KMOD_ALT) {
+         I_ToggleWindowFullscreenDesktop();
+      }
+
       //printf("KeyRelease:%d sym:%d\n", e.xkey.keycode, sym);
       queueKeyPress(0, e.key.keysym.sym);
     }
