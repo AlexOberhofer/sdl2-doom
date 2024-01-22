@@ -234,7 +234,7 @@ void I_InitGraphics (void)
     {
         window = SDL_CreateWindow("DOOM", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
             SDL_RESX, SDL_RESY, SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE);
-        renderer =  SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+        renderer =  SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED|SDL_RENDERER_TARGETTEXTURE);
         texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET,
             SDL_RESX, SDL_RESY);
 
