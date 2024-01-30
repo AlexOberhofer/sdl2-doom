@@ -50,7 +50,7 @@ typedef struct
     // If NULL, no init function is called.
 
     void (*InitMode)(byte *palette);
-    
+
     // Function to call to draw the screen from the source buffer.
     // Return true if draw was successful.
 
@@ -112,6 +112,8 @@ void I_ReadScreen (byte* scr);
 void I_BeginRead (void);
 
 void I_SetWindowTitle(char *title);
+void I_RescaleWindow(int newWidth, int newHeight);
+void I_ToggleWindowFullscreenDesktop (void);
 
 void I_CheckIsScreensaver(void);
 void I_SetGrabMouseCallback(grabmouse_callback_t func);

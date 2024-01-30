@@ -123,7 +123,7 @@ static void queueKeyPress(int pressed, unsigned int keyCode)
   s_KeyQueueWriteIndex %= KEYQUEUE_SIZE;
 }
 
-static void SDL_PollEvents() 
+static void SDL_PollEvents()
 {
   SDL_Event e;
 
@@ -135,17 +135,29 @@ static void SDL_PollEvents()
       exit(1);
     }
 
-    if (e.type == SDL_KEYDOWN) 
+    if (e.type == SDL_WINDOWEVENT) {
+      if (e.window.event == SDL_WINDOWEVENT_RESIZED) {
+        I_RescaleWindow(e.window.data1, e.window.data2);
+      }
+    }
+
+    else if (e.type == SDL_KEYDOWN)
     {
       //printf("KeyPress:%d sym:%d\n", e.xkey.keycode, sym);
       queueKeyPress(1, e.key.keysym.sym);
-    } 
-    else if (e.type == SDL_KEYUP) 
+    }
+    else if (e.type == SDL_KEYUP)
     {
+      /* Toggle fullscreen with `ALT+F` */
+      if (e.key.keysym.sym == SDLK_f
+       && e.key.keysym.mod & KMOD_ALT) {
+         I_ToggleWindowFullscreenDesktop();
+      }
+
       //printf("KeyRelease:%d sym:%d\n", e.xkey.keycode, sym);
       queueKeyPress(0, e.key.keysym.sym);
     }
-    else if(e.type == SDL_MOUSEBUTTONDOWN) 
+    else if(e.type == SDL_MOUSEBUTTONDOWN)
     {
       //printf("SDL_MOUSE_PRESSED: %d\n", e.button.button);
       queueKeyPress(1, e.button.button);
@@ -163,13 +175,13 @@ static void SDL_PollEvents()
 int GetKey(int* pressed, unsigned char* doomKey)
 {
     SDL_PollEvents();
-    
+
     uint8_t k_pressed = 0;
 
     if (s_KeyQueueReadIndex == s_KeyQueueWriteIndex)
     {
         k_pressed = 0;
-    } 
+    }
     else
     {
         unsigned short keyData = s_KeyQueue[s_KeyQueueReadIndex];
@@ -272,7 +284,7 @@ void I_GetEvent(void)
     event_t event;
     int pressed;
     unsigned char key;
-    
+
 	while (GetKey(&pressed, &key))
     {
         UpdateShiftStatus(pressed, key);
@@ -316,6 +328,4 @@ void I_GetEvent(void)
 
 void I_InitInput(void)
 {
-    
 }
-
